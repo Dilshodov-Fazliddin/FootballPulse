@@ -1,0 +1,33 @@
+package com.pulse.footballpulse.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.List;
+
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder(toBuilder = true)
+public class PostEntity extends BaseEntity {
+    @Column(nullable = false)
+    private String title;
+    @Column(nullable = false)
+    private String content;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private UserEntity author;
+    @Column(nullable = false)
+    private String rejectionReason;
+    private String imageUrl;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<CommentEntity> comments;
+    private Integer likes;
+    private Integer dislikes;
+    @Singular
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> tags;
+
+
+}
