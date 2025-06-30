@@ -2,6 +2,8 @@ package com.pulse.footballpulse.entity;
 
 import com.pulse.footballpulse.entity.enums.FriendStatus;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.*;
 
@@ -14,7 +16,13 @@ import java.util.UUID;
 @Setter
 @Builder(toBuilder = true)
 public class FriendEntity extends BaseEntity {
-    private UUID user;
-    private UUID friend;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
+
+    @ManyToOne
+    @JoinColumn(name = "friend_id")
+    private UserEntity friend;
+
     private FriendStatus status;
 }

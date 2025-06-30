@@ -25,6 +25,10 @@ public class UserMapper {
                 .username(userCreateDto.getUsername())
                 .code(code)
                 .team(null)
+                .isAccountNonExpired(true)
+                .isEnabled(true)
+                .isAccountNonLocked(true)
+                .isCredentialsNonExpired(true)
                 .build();
     }
 }

@@ -1,6 +1,6 @@
 package com.pulse.footballpulse.entity;
 
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.UUID;
@@ -13,8 +13,14 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 public class CommentEntity extends BaseEntity {
     private String comment;
-    private UUID userId;
-    private UUID postId;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    private PostEntity post;
+    @Column(name = "likes_count")
     private Integer like;
+    @Column(name = "dislikes_count")
     private Integer dislike;
 }

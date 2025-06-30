@@ -21,7 +21,7 @@ public class PostEntity extends BaseEntity {
     @Column(nullable = false)
     private String rejectionReason;
     private String imageUrl;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommentEntity> comments;
     private Integer likes;
     private Integer dislikes;

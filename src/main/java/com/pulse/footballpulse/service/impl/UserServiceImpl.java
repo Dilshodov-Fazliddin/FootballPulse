@@ -15,14 +15,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final JwtTokenService jwtTokenService;
 
@@ -46,6 +44,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                    .message("Login in system")
                    .status(200)
                    .build());
+
+
        }
        throw new DataNotFoundException("User not found!");
     }
