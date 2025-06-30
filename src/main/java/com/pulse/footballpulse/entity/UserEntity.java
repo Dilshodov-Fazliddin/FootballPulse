@@ -44,7 +44,6 @@ public class UserEntity extends BaseEntity implements UserDetails {
     @Column(unique = true,nullable = false)
     private String username;
     private Integer code;
-    @Column(nullable = true)
     private String team;
     private Boolean isAccountNonExpired;
     private Boolean isAccountNonLocked;
