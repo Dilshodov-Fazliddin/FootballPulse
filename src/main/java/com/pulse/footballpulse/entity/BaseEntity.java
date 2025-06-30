@@ -18,9 +18,10 @@ import java.util.UUID;
 @Getter
 @Setter
 public abstract class BaseEntity {
+
+    //@GenericGenerator is deprecated, so I changed to GeneratedValue annotation.
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2",strategy = "uuid2")
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
     @CreationTimestamp
