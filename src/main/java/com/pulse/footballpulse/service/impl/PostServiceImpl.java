@@ -13,9 +13,10 @@ import com.pulse.footballpulse.exception.ForbiddenException;
 import com.pulse.footballpulse.mapper.PostMapper;
 import com.pulse.footballpulse.repository.PostRepository;
 import com.pulse.footballpulse.repository.UserRepository;
-import com.pulse.footballpulse.service.EmailService;
+import com.pulse.footballpulse.event.PostStatusChangedEvent;
 import com.pulse.footballpulse.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostMapper postMapper;
-    private final EmailService emailService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public PostResponseDto createPost(PostCreateDto postCreateDto, UUID authorId) {
@@ -108,14 +109,21 @@ public class PostServiceImpl implements PostService {
 
         PostEntity updatedPost = postRepository.save(postEntity);
 
-        // Send email notification to author about status change
+        // Publish event for email notification
         try {
             String authorName = updatedPost.getAuthor().getFirstName() + " " + updatedPost.getAuthor().getLastName();
             PostResponseDto responseDto = postMapper.toResponseDto(updatedPost);
-            emailService.sendPostStatusNotification(updatedPost.getAuthor().getMail(), authorName, responseDto);
+
+            PostStatusChangedEvent event = new PostStatusChangedEvent(
+                responseDto,
+                updatedPost.getAuthor().getMail(),
+                authorName
+            );
+
+            eventPublisher.publishEvent(event);
         } catch (Exception e) {
             // Log error but don't fail the status update
-            System.err.println("Failed to send email notification: " + e.getMessage());
+            System.err.println("Failed to publish email notification event: " + e.getMessage());
         }
 
         return postMapper.toResponseDto(updatedPost);
