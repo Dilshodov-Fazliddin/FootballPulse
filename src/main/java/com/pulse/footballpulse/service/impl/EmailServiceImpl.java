@@ -18,6 +18,10 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
+import java.util.Random;
+import java.util.UUID;
+
 
 @Service
 @RequiredArgsConstructor
@@ -148,10 +152,53 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+    @Override
+    public void sendInvitationEmail(String targetEmail, String inviterName, UUID teamId) {
+        String inviteToken = generateUniqueToken();
+        String joinLink = "http://localhost:8080/football-pulse/team-member/join?teamId=" + teamId + "&token=" + inviteToken;
+
+        String subject = "Team Invitation - Football Pulse";
+        String content = """
+                Hello,
+
+                %s has invited you to join their team on Football Pulse.
+
+                Click the link below to join:
+                %s
+
+                Best regards,
+                Football Pulse Team
+                """.formatted(inviterName, joinLink);
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(targetEmail);
+        message.setFrom(adminEmail);
+        message.setSubject(subject);
+        message.setText(content);
+        mailSender.send(message);
+
+        UserEntity user = userRepository.findByMail(targetEmail)
+                .orElseThrow(() -> new DataNotFoundException("User not found"));
+
+        user.setInviteToken(inviteToken);
+        userRepository.save(user);
+    }
+
 
     private boolean hasAuthorPermission(UserRoles role) {
         return role == UserRoles.ROLE_AUTHOR || 
                role == UserRoles.ROLE_CLUB || 
                role == UserRoles.ROLE_ADMIN;
     }
+
+    private String generateUniqueToken() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder token = new StringBuilder();
+        Random random = new SecureRandom();
+        for (int i = 0; i < 10; i++) {
+            token.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return token.toString();
+    }
+
 }

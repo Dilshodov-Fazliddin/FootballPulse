@@ -13,5 +13,5 @@ public interface TeamMemberService {
     ResponseEntity<ApiResponse<?>> showTeamMembers(UUID teamId);
     ResponseEntity<ApiResponse<?>> leaveTeam(UUID teamId,UUID memberId);
     ResponseEntity<ApiResponse<?>> deleteMember(UUID teamId, UUID memberId, UserEntity requester);
-    ResponseEntity<ApiResponse<?>> joinTeam(String mail,String inviteToken,UUID teamId);
+    ResponseEntity<ApiResponse<?>> joinTeam(UserEntity user,String inviteToken,UUID teamId);
 }

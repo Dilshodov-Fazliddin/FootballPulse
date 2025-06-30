@@ -10,7 +10,7 @@ import com.pulse.footballpulse.exception.DataNotFoundException;
 import com.pulse.footballpulse.repository.TeamMemberRepository;
 import com.pulse.footballpulse.repository.TeamRepository;
 import com.pulse.footballpulse.repository.UserRepository;
-import com.pulse.footballpulse.service.TeamEmailService;
+import com.pulse.footballpulse.service.EmailService;
 import com.pulse.footballpulse.service.TeamMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +26,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
     private final TeamMemberRepository teamMemberRepository;
-    private final TeamEmailService emailService;
+    private final EmailService emailService;
     @Override
     public ResponseEntity<ApiResponse<?>> inviteMember(UUID teamId, TeamInviteDto dto, UserEntity requester) {
         TeamEntity team = teamRepository.findById(teamId)
@@ -65,11 +65,8 @@ public class TeamMemberServiceImpl implements TeamMemberService {
 
     @Override
     @Transactional
-    public ResponseEntity<ApiResponse<?>> joinTeam(String mail, String inviteToken,UUID teamId) {
-        UserEntity user = userRepository.findByMail(mail);
-        if (user == null){
-            throw new DataNotFoundException("User not found");
-        } else if (!user.getInviteToken().equals(inviteToken)) {
+    public ResponseEntity<ApiResponse<?>> joinTeam(UserEntity user, String inviteToken,UUID teamId) {
+        if (!user.getInviteToken().equals(inviteToken)) {
             return ResponseEntity.ok(
                     ApiResponse.builder()
                             .message("Invalid url")
