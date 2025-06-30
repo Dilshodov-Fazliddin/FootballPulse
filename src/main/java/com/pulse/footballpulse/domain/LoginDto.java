@@ -1,12 +1,11 @@
 package com.pulse.footballpulse.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 public class LoginDto {
     private String mail;
     private String password;

@@ -20,6 +20,7 @@ public class AuthenticationService {
         String username=claims.getSubject();
 
 
+        assert roles != null;
         UsernamePasswordAuthenticationToken authenticationToken=
                 new UsernamePasswordAuthenticationToken(
                         username,

@@ -1,13 +1,12 @@
 package com.pulse.footballpulse.domain;
 
 import com.pulse.footballpulse.entity.enums.Gender;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 public class UserCreateDto {
     private String firstName;
     private String lastName;
