@@ -1,5 +1,6 @@
 package com.pulse.footballpulse.entity;
 
+import com.pulse.footballpulse.entity.enums.PostStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,7 +19,10 @@ public class PostEntity extends BaseEntity {
     private String content;
     @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity author;
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
+    private PostStatus status = PostStatus.TO_REVIEW;
     private String rejectionReason;
     private String imageUrl;
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
