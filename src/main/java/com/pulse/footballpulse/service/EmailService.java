@@ -3,6 +3,8 @@ package com.pulse.footballpulse.service;
 import com.pulse.footballpulse.domain.EmailPostSubmissionDto;
 import com.pulse.footballpulse.domain.PostResponseDto;
 
+import java.util.UUID;
+
 public interface EmailService {
     
     void sendPostStatusNotification(String authorEmail, String authorName, PostResponseDto post);
@@ -14,5 +16,7 @@ public interface EmailService {
     void sendSubmissionConfirmation(String authorEmail, String authorName, PostResponseDto post);
 
     void sendVerificationCode(String name,String mail, int verificationCode);
+
+    void sendInvitationEmail(String targetEmail, String inviterName, UUID teamId);
 
 }

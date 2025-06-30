@@ -51,6 +51,8 @@ public class UserEntity extends BaseEntity implements UserDetails {
     private Boolean isCredentialsNonExpired;
     private Boolean isEnabled;
 
+    private String inviteToken;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(role.toString());
