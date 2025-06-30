@@ -10,6 +10,7 @@ import com.pulse.footballpulse.exception.DataNotFoundException;
 import com.pulse.footballpulse.repository.UserRepository;
 import com.pulse.footballpulse.service.EmailService;
 import com.pulse.footballpulse.service.PostService;
+import com.pulse.footballpulse.util.EmailTemplateBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +33,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Value("${app.email.submission.address}")
     private String submissionEmail;
-
+    private final EmailTemplateBuilder emailTemplateBuilder;
     @Override
     public void sendPostStatusNotification(String authorEmail, String authorName, PostResponseDto post) {
         try {
@@ -41,7 +42,7 @@ public class EmailServiceImpl implements EmailService {
             message.setFrom(submissionEmail);
             message.setSubject("Post Status Update - " + post.getTitle());
 
-            String emailBody = buildStatusNotificationBody(authorName, post);
+            String emailBody = emailTemplateBuilder.buildStatusNotificationBody(authorName, post);
             message.setText(emailBody);
 
             mailSender.send(message);
@@ -55,7 +56,8 @@ public class EmailServiceImpl implements EmailService {
     public PostResponseDto processEmailSubmission(EmailPostSubmissionDto emailSubmission) {
         try {
             // Find author by email
-            UserEntity author = userRepository.findByMail(emailSubmission.getAuthorEmail());
+            UserEntity author = userRepository.findByMail(emailSubmission.getAuthorEmail())
+                    .orElseThrow(()->new DataNotFoundException("Author not found"));
 
             if (author == null) {
                 throw new DataNotFoundException("Author not found with email: " + emailSubmission.getAuthorEmail());
@@ -103,7 +105,7 @@ public class EmailServiceImpl implements EmailService {
             message.setFrom(submissionEmail);
             message.setSubject("New Post Submission for Review - " + post.getTitle());
 
-            String emailBody = buildAdminNotificationBody(post);
+            String emailBody = emailTemplateBuilder.buildAdminNotificationBody(post);
             message.setText(emailBody);
 
             mailSender.send(message);
@@ -121,7 +123,7 @@ public class EmailServiceImpl implements EmailService {
             message.setFrom(submissionEmail);
             message.setSubject("Submission Confirmation - " + post.getTitle());
 
-            String emailBody = buildSubmissionConfirmationBody(authorName, post);
+            String emailBody = emailTemplateBuilder.buildSubmissionConfirmationBody(authorName, post);
             message.setText(emailBody);
 
             mailSender.send(message);
@@ -131,54 +133,21 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    private String buildStatusNotificationBody(String authorName, PostResponseDto post) {
-        StringBuilder body = new StringBuilder();
-        body.append("Dear ").append(authorName).append(",\n\n");
-        body.append("Your post \"").append(post.getTitle()).append("\" has been reviewed.\n\n");
-        body.append("Status: ").append(post.getStatus()).append("\n");
-
-        if (post.getStatus() == PostStatus.APPROVED) {
-            body.append("Congratulations! Your post has been approved and is now live on Football Pulse.\n");
-        } else if (post.getStatus() == PostStatus.REJECTED) {
-            body.append("Unfortunately, your post has been rejected.\n");
-            if (post.getRejectionReason() != null) {
-                body.append("Reason: ").append(post.getRejectionReason()).append("\n");
-            }
-            body.append("Please review our content guidelines and feel free to submit again.\n");
-        } else if (post.getStatus() == PostStatus.PENDING_REVIEW) {
-            body.append("Your post requires additional review. We'll notify you once the review is complete.\n");
+    @Override
+    public void sendVerificationCode(String name,String mail, int verificationCode) {
+        try {
+            userRepository.findByMail(mail);
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(mail);
+            message.setSubject("Verification Code");
+            message.setText(emailTemplateBuilder.buildVerificationCode(name, verificationCode));
+            mailSender.send(message);
+            log.info("Verification code sent");
+        } catch (Exception e) {
+            log.error("Failed to send verification code to {}: {}", mail, e.getMessage());
         }
-
-        body.append("\nBest regards,\nFootball Pulse Team");
-        return body.toString();
     }
 
-    private String buildAdminNotificationBody(PostResponseDto post) {
-        StringBuilder body = new StringBuilder();
-        body.append("A new post has been submitted via email and requires review:\n\n");
-        body.append("Title: ").append(post.getTitle()).append("\n");
-        body.append("Author: ").append(post.getAuthorName()).append("\n");
-        body.append("Post ID: ").append(post.getId()).append("\n");
-        body.append("Status: ").append(post.getStatus()).append("\n");
-        body.append("Submitted: ").append(post.getCreatedAt()).append("\n\n");
-        body.append("Please review this post in the admin panel.\n\n");
-        body.append("Football Pulse Admin System");
-        return body.toString();
-    }
-
-    private String buildSubmissionConfirmationBody(String authorName, PostResponseDto post) {
-        StringBuilder body = new StringBuilder();
-        body.append("Dear ").append(authorName).append(",\n\n");
-        body.append("Thank you for your submission to Football Pulse!\n\n");
-        body.append("Post Details:\n");
-        body.append("Title: ").append(post.getTitle()).append("\n");
-        body.append("Submission ID: ").append(post.getId()).append("\n");
-        body.append("Status: ").append(post.getStatus()).append("\n\n");
-        body.append("Your post is now in the review queue. Our editorial team will review it shortly.\n");
-        body.append("You will receive another email once the review is complete.\n\n");
-        body.append("Best regards,\nFootball Pulse Team");
-        return body.toString();
-    }
 
     private boolean hasAuthorPermission(UserRoles role) {
         return role == UserRoles.ROLE_AUTHOR || 

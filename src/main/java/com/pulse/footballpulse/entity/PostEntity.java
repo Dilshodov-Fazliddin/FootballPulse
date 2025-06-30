@@ -21,8 +21,7 @@ public class PostEntity extends BaseEntity {
     private UserEntity author;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Builder.Default
-    private PostStatus status = PostStatus.TO_REVIEW;
+    private PostStatus status;
     private String rejectionReason;
     private String imageUrl;
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
