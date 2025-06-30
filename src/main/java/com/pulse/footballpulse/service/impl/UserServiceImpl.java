@@ -6,6 +6,7 @@ import com.pulse.footballpulse.domain.response.ApiResponse;
 import com.pulse.footballpulse.domain.response.JwtResponse;
 import com.pulse.footballpulse.entity.UserEntity;
 import com.pulse.footballpulse.exception.DataNotFoundException;
+import com.pulse.footballpulse.exception.NotAcceptableException;
 import com.pulse.footballpulse.jwt.JwtTokenService;
 import com.pulse.footballpulse.mapper.UserMapper;
 import com.pulse.footballpulse.repository.UserRepository;
@@ -16,6 +17,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public ResponseEntity<ApiResponse<?>> signUp(UserCreateDto userDto) {
+        if(userRepository.existsByMail(userDto.getMail()))
+            throw new NotAcceptableException("User already exists");
+        int code=new Random().nextInt(1000,9000);
         userRepository.save(userMapper.toEntity(userDto,1234));
         return ResponseEntity.ok(ApiResponse.builder().message("Created").status(200).data(null).build());
     }

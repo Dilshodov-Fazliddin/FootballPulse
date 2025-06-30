@@ -15,13 +15,17 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-    public void authenticate(Claims claims, HttpServletRequest request)throws JsonProcessingException {
-        List<String> roles= (List<String>) claims.put("roles",List.of("ROLE_USER","ROLE_ADMIN","ROLE_MODERATOR","ROLE_AUTHOR","ROLE_CLUB","ROLE_GUEST"));
-        String username=claims.getSubject();
+    public void authenticate(Claims claims, HttpServletRequest request) throws JsonProcessingException {
+        String username = claims.getSubject();
 
+        @SuppressWarnings("unchecked")
+        List<String> roles = claims.get("roles", List.class);
 
-        assert roles != null;
-        UsernamePasswordAuthenticationToken authenticationToken=
+        if (roles == null) {
+            throw new IllegalArgumentException("No roles found in JWT claims");
+        }
+
+        UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(
                         username,
                         null,
@@ -31,7 +35,8 @@ public class AuthenticationService {
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
     }
 
-    public List<SimpleGrantedAuthority>getRoles(List<String>roles){
+
+    public List<SimpleGrantedAuthority> getRoles(List<String> roles) {
         return roles.stream()
                 .map(SimpleGrantedAuthority::new)
                 .toList();
