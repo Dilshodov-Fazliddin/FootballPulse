@@ -27,8 +27,8 @@ public interface PostRepository extends JpaRepository<PostEntity, UUID> {
     @Query("SELECT p FROM PostEntity p WHERE p.status IN ('TO_REVIEW', 'PENDING_REVIEW')")
     Page<PostEntity> findPostsForReview(Pageable pageable);
 
-    // Find approved posts
-    Page<PostEntity> findByStatusOrderByCreatedDateDesc(PostStatus status, Pageable pageable);
+//    // Find approved posts
+//    Page<PostEntity> findByStatusOrderByCreatedDateDesc(PostStatus status, Pageable pageable);
 
     // Search posts by title or content (only approved posts)
     @Query("SELECT p FROM PostEntity p WHERE p.status = 'APPROVED' AND (LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(p.content) LIKE LOWER(CONCAT('%', :keyword, '%')))")
