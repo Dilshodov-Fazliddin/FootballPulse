@@ -10,4 +10,5 @@ import org.springframework.stereotype.Service;
 public interface UserService {
     ResponseEntity<ApiResponse<?>>signUp(UserCreateDto userDto);
     ResponseEntity<ApiResponse<?>>login(LoginDto loginDto);
+    ResponseEntity<ApiResponse<?>>verifyAccount(String email, Integer code);
 }

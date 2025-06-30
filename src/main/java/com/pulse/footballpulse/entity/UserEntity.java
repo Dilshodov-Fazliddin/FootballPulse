@@ -43,7 +43,6 @@ public class UserEntity extends BaseEntity implements UserDetails {
     private String mail;
     @Column(unique = true,nullable = false)
     private String username;
-    @Column(nullable = false)
     private Integer code;
     @Column(nullable = true)
     private String team;
