@@ -4,6 +4,7 @@ import com.pulse.footballpulse.domain.FriendCreateDto;
 import com.pulse.footballpulse.domain.response.FriendResponseDto;
 import com.pulse.footballpulse.entity.FriendEntity;
 import com.pulse.footballpulse.entity.UserEntity;
+import com.pulse.footballpulse.entity.enums.FriendStatus;
 import com.pulse.footballpulse.exception.DataNotFoundException;
 import com.pulse.footballpulse.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +18,11 @@ public class FriendMapper {
     public FriendEntity toFriend(FriendCreateDto friendCreateDto) {
         UserEntity user = userRepository.findById(friendCreateDto.getUserId()).orElseThrow(() -> new DataNotFoundException("User Id not found with the id" + friendCreateDto.getUserId()));
         UserEntity friend = userRepository.findById(friendCreateDto.getUserId()).orElseThrow(() -> new DataNotFoundException("Friend Id not found with the id" + friendCreateDto.getFriendId()));
-        FriendEntity friendEntity = new FriendEntity();
-        friendEntity.setUser(user);
-        friendEntity.setFriend(friend);
-        friendEntity.setStatus(friendCreateDto.getStatus());
-        return friendEntity;
+        return FriendEntity.builder()
+                .user(user)
+                .friend(friend)
+                .status(FriendStatus.PENDING)
+                .build();
     }
 
     public FriendResponseDto toFriendResponse(FriendEntity friendEntity) {
