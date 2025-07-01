@@ -9,7 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
-@RestController("/football-pulse/auth")
+@RestController
+@RequestMapping("/football-pulse/auth")
 public class AuthController {
     private final UserService userService;
 
