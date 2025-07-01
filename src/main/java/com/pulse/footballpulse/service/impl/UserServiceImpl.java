@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -68,5 +69,23 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         UserEntity user = userRepository.findByMailAndCode(email, code).orElseThrow(() -> new DataNotFoundException("User not found"));
         user.setCode(null);
         return ResponseEntity.ok(ApiResponse.builder().status(200).message("User successfully verified").data(jwtTokenService.generateAccessToken(userRepository.save(user))).build());
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<?>> block(UUID userId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User not found"));
+        user.setIsEnabled(false);
+        emailService.sendUnBlockOrBlockMessage(user.getMail(),false);
+        userRepository.save(user);
+        return ResponseEntity.ok(ApiResponse.builder().status(200).message("User successfully blocked").data(null).build());
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<?>> unBlock(UUID userId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User not found"));
+        user.setIsEnabled(true);
+        emailService.sendUnBlockOrBlockMessage(user.getMail(),true);
+        userRepository.save(user);
+        return ResponseEntity.ok(ApiResponse.builder().status(200).message("User successfully unblocked").data(null).build());
     }
 }
