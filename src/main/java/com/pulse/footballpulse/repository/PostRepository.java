@@ -4,6 +4,7 @@ import com.pulse.footballpulse.entity.PostEntity;
 import com.pulse.footballpulse.entity.enums.PostStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,25 +16,21 @@ import java.util.UUID;
 @Repository
 public interface PostRepository extends JpaRepository<PostEntity, UUID> {
 
-    // Find posts by status
     Page<PostEntity> findByStatus(PostStatus status, Pageable pageable);
 
-    // Find posts by author
+    @EntityGraph(attributePaths = {"author"})
     List<PostEntity> findByAuthorId(UUID authorId);
-    // Find posts by author used with Pageable
+
+    @EntityGraph(attributePaths = {"author"})
     Page<PostEntity> findByAuthorId(UUID authorId, Pageable pageable);
 
-    // Find posts for review (TO_REVIEW and PENDING_REVIEW)
+    @EntityGraph(attributePaths = {"author"})
     @Query("SELECT p FROM PostEntity p WHERE p.status IN ('TO_REVIEW', 'PENDING_REVIEW')")
     Page<PostEntity> findPostsForReview(Pageable pageable);
 
-//    // Find approved posts
-//    Page<PostEntity> findByStatusOrderByCreatedDateDesc(PostStatus status, Pageable pageable);
-
-    // Search posts by title or content (only approved posts)
     @Query("SELECT p FROM PostEntity p WHERE p.status = 'APPROVED' AND (LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(p.content) LIKE LOWER(CONCAT('%', :keyword, '%')))")
     Page<PostEntity> searchApprovedPosts(@Param("keyword") String keyword, Pageable pageable);
 
-    // Find posts by author and status
+    @EntityGraph(attributePaths = {"author"})
     List<PostEntity> findByAuthorIdAndStatus(UUID authorId, PostStatus status);
 }
