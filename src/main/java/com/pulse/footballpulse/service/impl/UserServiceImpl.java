@@ -71,6 +71,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return ResponseEntity.ok(ApiResponse.builder().status(200).message("User successfully verified").data(jwtTokenService.generateAccessToken(userRepository.save(user))).build());
     }
 
+
     @Override
     public ResponseEntity<ApiResponse<?>> block(UUID userId) {
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User not found"));
