@@ -27,4 +27,5 @@ public class AuthController {
     public ResponseEntity<ApiResponse<?>> verify(@RequestParam String email, @RequestParam Integer code) {
         return userService.verifyAccount(email, code);
     }
+
 }

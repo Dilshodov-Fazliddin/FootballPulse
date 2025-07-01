@@ -184,6 +184,36 @@ public class EmailServiceImpl implements EmailService {
         userRepository.save(user);
     }
 
+    @Override
+    public void sendUnBlockOrBlockMessage(String email,boolean status) {
+        UserEntity user = userRepository.findByMail(email).orElseThrow(() -> new DataNotFoundException("User not found"));
+        if (!status) {
+            try {
+                SimpleMailMessage message = new SimpleMailMessage();
+                message.setTo(email);
+                message.setFrom(submissionEmail);
+                message.setSubject("Block Message");
+                message.setText(emailTemplateBuilder.buildBlockMessage(user.getFirstName()));
+                mailSender.send(message);
+                log.info("Block message sent");
+            } catch (Exception e) {
+                log.error("Failed to send block message to {}: {}", email, e.getMessage());
+            }
+        }else {
+            try {
+                SimpleMailMessage message = new SimpleMailMessage();
+                message.setTo(email);
+                message.setFrom(submissionEmail);
+                message.setSubject("UnBlock Message");
+                message.setText(emailTemplateBuilder.buildUnBlockMessage(user.getFirstName()));
+                mailSender.send(message);
+                log.info("UnBlock message sent");
+            } catch (Exception e) {
+                log.error("Failed to send unblock message to {}: {}", email, e.getMessage());
+            }
+        }
+    }
+
 
     private boolean hasAuthorPermission(UserRoles role) {
         return role == UserRoles.ROLE_AUTHOR || 

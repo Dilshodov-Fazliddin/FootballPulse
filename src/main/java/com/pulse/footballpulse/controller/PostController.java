@@ -115,7 +115,7 @@ public class PostController {
 
     // Author endpoints (create, update, delete posts)
     
-    @PostMapping
+    @PostMapping("/create")
     @PreAuthorize("hasAnyRole('AUTHOR', 'CLUB', 'ADMIN')")
     public ResponseEntity<ApiResponse<PostResponseDto>> createPost(@RequestBody PostCreateDto postCreateDto) {
         UUID authorId = getCurrentUserId();
