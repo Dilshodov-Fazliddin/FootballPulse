@@ -18,5 +18,5 @@ public interface EmailService {
     void sendVerificationCode(String name,String mail, int verificationCode);
 
     void sendInvitationEmail(String targetEmail, String inviterName, UUID teamId);
-
+    void sendUnBlockOrBlockMessage(String email,boolean status);
 }

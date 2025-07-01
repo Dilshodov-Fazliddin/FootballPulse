@@ -6,6 +6,7 @@ import com.pulse.footballpulse.domain.response.ApiResponse;
 import com.pulse.footballpulse.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -28,4 +29,5 @@ public class AuthController {
     public ResponseEntity<ApiResponse<?>> verify(@RequestParam String email, @RequestParam Integer code) {
         return userService.verifyAccount(email, code);
     }
+
 }

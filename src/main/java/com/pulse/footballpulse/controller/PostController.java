@@ -43,7 +43,6 @@ public class PostController {
                 .data(posts)
                 .build());
     }
-
     @GetMapping("/{postId}")
     public ResponseEntity<ApiResponse<PostResponseDto>> getPostById(@PathVariable UUID postId) {
         PostResponseDto post = postService.getPostById(postId);

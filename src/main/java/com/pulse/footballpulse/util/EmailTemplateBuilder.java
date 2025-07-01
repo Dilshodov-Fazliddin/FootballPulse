@@ -56,11 +56,20 @@ public class EmailTemplateBuilder {
     }
 
     public String buildVerificationCode(String authorName, Integer code) {
-        StringBuilder message = new StringBuilder();
-        message.append("Dear ").append(authorName).append("\n");
-        message.append("Welcome to our system 😉").append("\n");
-        message.append("Your verification code 🗝️: ").append(code);
-        return message.toString();
+        return "Dear " + authorName + "\n" +
+                "Welcome to our system 😉" + "\n" +
+                "Your verification code 🗝️: " + code;
     }
 
+
+    public String buildBlockMessage(String authorName) {
+        return "Dear " + authorName + "\n" +
+                "Unfortunately, your account has blocked";
+    }
+
+    public String buildUnBlockMessage(String authorName) {
+        return "Dear " + authorName + "\n" +
+                "Your account unlocked" +"\n"+
+                "We hope you never do anything forbidden.";
+    }
 }
