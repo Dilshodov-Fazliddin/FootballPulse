@@ -23,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import java.util.Random;
@@ -69,7 +70,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> verifyAccount(String email, Integer code) {
+    public ResponseEntity<ApiResponse<?>> verifyAccount (String email, Integer code) {
         UserEntity user = userRepository.findByMailAndCode(email, code).orElseThrow(() -> new DataNotFoundException("User not found"));
         user.setCode(null);
         return ResponseEntity.ok(ApiResponse.builder().status(200).message("User successfully verified").data(jwtTokenService.generateAccessToken(userRepository.save(user))).build());
@@ -84,11 +85,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         String email = authentication.getName();
 
         // Find a user by email and return their UUID
-        UserEntity user = userRepository.findByMail(email);
-        if (user == null) {
+        Optional<UserEntity> user = userRepository.findByMail(email);
+        if (user.isEmpty()) {
             throw new DataNotFoundException("User not found with email: " + email);
         }
 
-        return user.getId();
+        return user.get().getId();
     }
 }
