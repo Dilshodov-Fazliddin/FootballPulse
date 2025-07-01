@@ -47,9 +47,7 @@ public class SecurityConfiguration {
                                         "/football-pulse/post/search", "/football-pulse/auth/login").permitAll()
 
                                 .requestMatchers("/football-pulse/post/**",
-
                                         "/football-pulse/email/**").authenticated()
-
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
