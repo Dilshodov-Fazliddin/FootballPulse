@@ -41,20 +41,17 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requestsConfigurer ->
                         requestsConfigurer
-                                .requestMatchers("/auth/sign-up",
-                                        "/api/posts/approved",
-                                        "/api/posts/{postId}",
-                                        "/api/posts/search").permitAll()
+                                .requestMatchers("/football-pulse/auth/sign-up",
+                                        "/football-pulse/post/approved",
+                                        "/football-pulse/post/{postId}",
+                                        "/football-pulse/post/search", "/football-pulse/auth/login").permitAll()
 
-                                .requestMatchers("/api/posts/**",
-                                        "/auth/login",
-                                        "/api/email/**").authenticated()
+                                .requestMatchers("/football-pulse/post/**",
 
+                                        "/football-pulse/email/**").authenticated()
 
                                 .anyRequest().authenticated()
                 )
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(new JwtTokenFilter(jwtTokenService, authenticationService),
                         UsernamePasswordAuthenticationFilter.class)
