@@ -12,10 +12,15 @@ import com.pulse.footballpulse.repository.UserRepository;
 import com.pulse.footballpulse.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -48,5 +53,22 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
        }
        throw new DataNotFoundException("User not found!");
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    // Helper method to get the current user ID from a security context
+    public UUID getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // Get the email from authentication (UserEntity.getUsername() returns email)
+        String email = authentication.getName();
+
+        // Find a user by email and return their UUID
+        UserEntity user = userRepository.findByMail(email);
+        if (user == null) {
+            throw new DataNotFoundException("User not found with email: " + email);
+        }
+
+        return user.getId();
     }
 }

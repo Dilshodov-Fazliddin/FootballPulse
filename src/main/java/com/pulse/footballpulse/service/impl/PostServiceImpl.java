@@ -41,7 +41,7 @@ public class PostServiceImpl implements PostService {
         UserEntity author = userRepository.findById(authorId)
                 .orElseThrow(() -> new DataNotFoundException("Author not found"));
 
-        // Check if user has permission to create posts (AUTHOR, CLUB, ADMIN)
+        // Check if the user has permission to create posts (AUTHOR, CLUB, ADMIN)
         if (!hasAuthorPermission(author.getRole())) {
             throw new ForbiddenException("User does not have permission to create posts");
         }
