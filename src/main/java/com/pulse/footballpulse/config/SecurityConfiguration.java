@@ -39,7 +39,10 @@ public class SecurityConfiguration {
                     return corsConfiguration;
                 }))
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .authorizeHttpRequests(auth ->
+                        auth
+                                .requestMatchers("/football-pulse/auth/**").permitAll()
+                                .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(new JwtTokenFilter(jwtTokenService, authenticationService),
                         UsernamePasswordAuthenticationFilter.class)

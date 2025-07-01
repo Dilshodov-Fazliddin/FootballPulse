@@ -15,19 +15,16 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final UserService userService;
 
-    @PreAuthorize("permitAll()")
     @PostMapping("/sign-up")
     public ResponseEntity<ApiResponse<?>> signUp(@RequestBody UserCreateDto userCreateDto) {
         return userService.signUp(userCreateDto);
     }
 
-    @PreAuthorize("permitAll()")
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<?>> login(@RequestBody LoginDto loginDto) {
         return userService.login(loginDto);
     }
 
-    @PreAuthorize("permitAll()")
     @PutMapping("/verify")
     public ResponseEntity<ApiResponse<?>> verify(@RequestParam String email, @RequestParam Integer code) {
         return userService.verifyAccount(email, code);
