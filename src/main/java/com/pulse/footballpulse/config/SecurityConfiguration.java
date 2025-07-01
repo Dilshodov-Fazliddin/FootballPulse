@@ -43,6 +43,7 @@ public class SecurityConfiguration {
                         auth
                                 .requestMatchers("/football-pulse/auth/**").permitAll()
                                 .anyRequest().authenticated())
+
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(new JwtTokenFilter(jwtTokenService, authenticationService),
                         UsernamePasswordAuthenticationFilter.class)

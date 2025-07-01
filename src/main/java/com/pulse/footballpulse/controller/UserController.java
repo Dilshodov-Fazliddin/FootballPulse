@@ -25,6 +25,7 @@ public class UserController {
         return userService.block(id);
     }
 
+
     @PutMapping("/unblock")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<?>> unblockUser(@RequestParam UUID id){
