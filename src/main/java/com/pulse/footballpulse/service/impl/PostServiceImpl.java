@@ -123,7 +123,7 @@ public class PostServiceImpl implements PostService {
             eventPublisher.publishEvent(event);
         } catch (Exception e) {
             // Log error but don't fail the status update
-            System.err.println("Failed to publish email notification event: " + e.getMessage());
+            System.err.println("Failed to send email notification: " + e.getMessage());
         }
 
         return postMapper.toResponseDto(updatedPost);

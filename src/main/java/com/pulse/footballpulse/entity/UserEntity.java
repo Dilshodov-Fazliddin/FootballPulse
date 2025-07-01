@@ -42,14 +42,14 @@ public class UserEntity extends BaseEntity implements UserDetails {
     private String mail;
     @Column(unique = true,nullable = false)
     private String username;
-    @Column(nullable = false)
     private Integer code;
-    @Column(nullable = true)
     private String team;
     private Boolean isAccountNonExpired;
     private Boolean isAccountNonLocked;
     private Boolean isCredentialsNonExpired;
     private Boolean isEnabled;
+
+    private String inviteToken;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
