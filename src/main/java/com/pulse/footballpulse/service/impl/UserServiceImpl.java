@@ -93,7 +93,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
         return user.get().getId();
-
+    }
 
     @Override
     public ResponseEntity<ApiResponse<?>> block(UUID userId) {
@@ -111,6 +111,5 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         emailService.sendUnBlockOrBlockMessage(user.getMail(),true);
         userRepository.save(user);
         return ResponseEntity.ok(ApiResponse.builder().status(200).message("User successfully unblocked").data(null).build());
-
     }
 }
