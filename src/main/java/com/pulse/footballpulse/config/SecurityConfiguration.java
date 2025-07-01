@@ -39,21 +39,10 @@ public class SecurityConfiguration {
                     return corsConfiguration;
                 }))
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(requestsConfigurer ->
-                        requestsConfigurer
-                                .requestMatchers("/auth/sign-up",
-                                        "/api/posts/approved",
-                                        "/api/posts/{postId}",
-                                        "/api/posts/search").permitAll()
-
-                                .requestMatchers("/api/posts/**",
-                                        "/auth/login",
-                                        "/api/email/**").authenticated()
-
-
-                                .anyRequest().authenticated()
-                )
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .authorizeHttpRequests(auth ->
+                        auth
+                                .requestMatchers("/football-pulse/auth/**").permitAll()
+                                .anyRequest().authenticated())
 
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(new JwtTokenFilter(jwtTokenService, authenticationService),
