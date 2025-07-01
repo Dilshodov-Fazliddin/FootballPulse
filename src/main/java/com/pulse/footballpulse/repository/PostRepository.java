@@ -24,7 +24,6 @@ public interface PostRepository extends JpaRepository<PostEntity, UUID> {
     @EntityGraph(attributePaths = {"author"})
     Page<PostEntity> findByAuthorId(UUID authorId, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"author"})
     @Query("SELECT p FROM PostEntity p WHERE p.status IN ('TO_REVIEW', 'PENDING_REVIEW')")
     Page<PostEntity> findPostsForReview(Pageable pageable);
 
