@@ -14,16 +14,20 @@ import lombok.Setter;
 public class ThreadedCommentDto {
     private UUID id;
     private String comment;
+    private Integer likes;
+    private Integer dislikes;
+    private Boolean isEdited;
     private UUID userId;
-    private Integer likeCount;
     private List<ThreadedCommentDto> replies;
 
     public static ThreadedCommentDto buildWithReplies(ThreadedCommentDto parent, List<ThreadedCommentDto> replies) {
         ThreadedCommentDto dto = new ThreadedCommentDto();
         dto.setId(parent.getId());
         dto.setComment(parent.getComment());
+        dto.setLikes(parent.getLikes());
+        dto.setDislikes(parent.getDislikes());
+        dto.setIsEdited(parent.getIsEdited());
         dto.setUserId(parent.getUserId());
-        dto.setLikeCount(parent.getLikeCount());
         dto.setReplies(replies);
         return dto;
     }

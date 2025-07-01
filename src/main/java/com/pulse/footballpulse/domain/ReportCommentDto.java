@@ -8,11 +8,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class CreateCommentDto {
-    private String comment;
-    private UUID postId;
-    private UUID parentCommentId;
-
+@NoArgsConstructor
+public class ReportCommentDto {
+    private UUID commentId;
+    private String reason;
+    
 }

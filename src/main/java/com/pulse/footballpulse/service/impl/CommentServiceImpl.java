@@ -11,14 +11,16 @@ import com.pulse.footballpulse.repository.PostRepository;
 import com.pulse.footballpulse.repository.UserRepository;
 import com.pulse.footballpulse.service.CommentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +31,6 @@ public class CommentServiceImpl implements CommentService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CommentMapper commentMapper;
-    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public CommentDto createComment(CreateCommentDto createDto, UUID userId) {
@@ -60,26 +61,51 @@ public class CommentServiceImpl implements CommentService {
     public void deleteComment(UUID commentId) {
         CommentEntity comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new DataNotFoundException("Comment Not Found"));
-    
 
         commentRepository.delete(comment);
     }
 
     @Override
     public CommentDto getCommentById(UUID commentId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCommentById'");
+        return commentRepository.findById(commentId)
+                .map(commentMapper::toCommentDto)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
     }
 
     @Override
     public Page<CommentDto> getCommentsByPost(UUID postId, Pageable pageable) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCommentsByPost'");
+         List<CommentEntity> allComments = commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
+        int start = Math.min((int) pageable.getOffset(), allComments.size());
+        int end = Math.min(start + pageable.getPageSize(), allComments.size());
+
+        List<CommentDto> content = allComments.subList(start, end).stream()
+                .map(commentMapper::toCommentDto)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(content, pageable, allComments.size());
     }
 
     @Override
     public ThreadedCommentDto getCommentThread(UUID rootCommentId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCommentThread'");
+        CommentEntity root = commentRepository.findById(rootCommentId)
+                .orElseThrow(() -> new RuntimeException("Root comment not found"));
+
+        return buildThreadedComment(root);
+    }
+
+    private ThreadedCommentDto buildThreadedComment(CommentEntity entity) {
+        ThreadedCommentDto dto = commentMapper.toThreadedCommentDto(entity);
+
+        List<CommentEntity> replies = commentRepository.findByParentCommentIdOrderByCreatedAtAsc(entity.getId());
+
+        if (replies != null && !replies.isEmpty()) {
+            dto.setReplies(replies.stream()
+                    .map(this::buildThreadedComment)
+                    .collect(Collectors.toList()));
+        } else {
+            dto.setReplies(new ArrayList<>());
+        }
+
+        return dto;
     }
 }

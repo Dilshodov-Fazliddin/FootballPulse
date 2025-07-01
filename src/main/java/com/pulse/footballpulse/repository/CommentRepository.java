@@ -34,4 +34,7 @@ public interface CommentRepository extends JpaRepository<CommentEntity,UUID> {
 
     @Query("SELECT COUNT(c) FROM CommentEntity c WHERE c.parentComment.id = :parentId")
     int countReplies(@Param("parentId") UUID parentId);
+
+    List<CommentEntity> findByPostIdOrderByCreatedAtAsc(UUID postId);
+    List<CommentEntity> findByParentCommentIdOrderByCreatedAtAsc(UUID parentId);
 }
