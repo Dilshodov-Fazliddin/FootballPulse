@@ -39,11 +39,17 @@ public class SecurityConfiguration {
                     return corsConfiguration;
                 }))
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth ->
-                        auth
-                                .requestMatchers("/football-pulse/auth/**").permitAll()
-                                .anyRequest().authenticated())
+                .authorizeHttpRequests(requestsConfigurer ->
+                        requestsConfigurer
+                                .requestMatchers("/football-pulse/auth/sign-up",
+                                        "/football-pulse/post/approved",
+                                        "/football-pulse/post/{postId}",
+                                        "/football-pulse/post/search", "/football-pulse/auth/login").permitAll()
 
+                                .requestMatchers("/football-pulse/post/**",
+                                        "/football-pulse/email/**").authenticated()
+                                .anyRequest().authenticated()
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(new JwtTokenFilter(jwtTokenService, authenticationService),
                         UsernamePasswordAuthenticationFilter.class)
