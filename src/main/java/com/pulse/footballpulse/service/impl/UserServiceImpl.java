@@ -14,11 +14,17 @@ import com.pulse.footballpulse.service.EmailService;
 import com.pulse.footballpulse.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+import java.util.UUID;
 
 import java.util.Random;
 import java.util.UUID;
@@ -65,11 +71,28 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> verifyAccount(String email, Integer code) {
+    public ResponseEntity<ApiResponse<?>> verifyAccount (String email, Integer code) {
         UserEntity user = userRepository.findByMailAndCode(email, code).orElseThrow(() -> new DataNotFoundException("User not found"));
         user.setCode(null);
         return ResponseEntity.ok(ApiResponse.builder().status(200).message("User successfully verified").data(jwtTokenService.generateAccessToken(userRepository.save(user))).build());
     }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    // Helper method to get the current user ID from a security context
+    public UUID getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // Get the email from authentication (UserEntity.getUsername() returns email)
+        String email = authentication.getName();
+
+        // Find a user by email and return their UUID
+        Optional<UserEntity> user = userRepository.findByMail(email);
+        if (user.isEmpty()) {
+            throw new DataNotFoundException("User not found with email: " + email);
+        }
+
+        return user.get().getId();
 
 
     @Override
@@ -88,5 +111,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         emailService.sendUnBlockOrBlockMessage(user.getMail(),true);
         userRepository.save(user);
         return ResponseEntity.ok(ApiResponse.builder().status(200).message("User successfully unblocked").data(null).build());
+
     }
 }

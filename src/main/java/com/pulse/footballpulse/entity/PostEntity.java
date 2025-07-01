@@ -31,6 +31,4 @@ public class PostEntity extends BaseEntity {
     @Singular
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> tags;
-
-
 }
