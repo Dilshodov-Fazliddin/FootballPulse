@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -108,4 +109,54 @@ public class CommentServiceImpl implements CommentService {
 
         return dto;
     }
+    
+    @Override
+    public CommentDto likeComment(UUID commentId, UUID userId) {
+        CommentEntity comment = commentRepository.findById(commentId)
+            .orElseThrow(() -> new RuntimeException("Comment not found"));
+
+        comment.setLikes(Math.max(0, comment.getLikes()) + 1);
+    return commentMapper.toCommentDto(commentRepository.save(comment));
+    }
+
+    @Override   
+    public CommentDto dislikeComment(UUID commentId, UUID userId) {
+        CommentEntity comment = commentRepository.findById(commentId)
+            .orElseThrow(() -> new RuntimeException("Comment not found"));
+
+        comment.setDislikes(Math.max(0, comment.getDislikes()) + 1);
+    return commentMapper.toCommentDto(commentRepository.save(comment));
+    }
+
+    @Override
+public CommentDto replyToComment(UUID parentCommentId, CreateCommentDto dto, UUID userId) {
+    
+    UserEntity user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    
+    PostEntity post = postRepository.findById(dto.getPostId())
+            .orElseThrow(() -> new RuntimeException("Post not found"));
+
+    
+    CommentEntity parent = commentRepository.findById(parentCommentId)
+            .orElseThrow(() -> new RuntimeException("Parent comment not found"));
+
+ 
+    CommentEntity reply = CommentEntity.builder()
+            .comment(dto.getComment())
+            .user(user)
+            .post(post)
+            .likes(0)
+            .dislikes(0)
+            .isEdited(false)
+            .createdAt(LocalDateTime.now())
+            .parentComment(parent)
+            .build();
+
+    
+    CommentEntity savedReply = commentRepository.save(reply);
+
+    return commentMapper.toCommentDto(savedReply);
+}
 }

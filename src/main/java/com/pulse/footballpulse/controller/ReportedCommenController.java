@@ -27,6 +27,7 @@ public class ReportedCommenController {
     
     private final ReportedCommentService reportService;
 
+    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN', 'MODERATOR')")
     @PostMapping
     public ResponseEntity<Void> reportComment(@RequestBody ReportCommentDto dto,
                                               @RequestHeader("X-User-ID") UUID userId) {
@@ -35,13 +36,13 @@ public class ReportedCommenController {
     }
 
     @GetMapping("/unresolved")
-    @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
     public ResponseEntity<List<ReportedCommentEntity>> getUnresolvedReports() {
         return ResponseEntity.ok(reportService.getUnresolvedReports());
     }
 
     @PatchMapping("/{reportId}/resolve")
-    @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
     public ResponseEntity<Void> resolveReport(@PathVariable UUID reportId) {
         reportService.resolveReport(reportId);
         return ResponseEntity.noContent().build();
