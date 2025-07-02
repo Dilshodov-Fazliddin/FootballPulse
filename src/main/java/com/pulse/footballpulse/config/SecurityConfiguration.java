@@ -28,6 +28,13 @@ public class SecurityConfiguration {
     private final AuthenticationService authenticationService;
     private final PasswordEncoder passwordEncoder;
 
+    private final String[] permitAllUrls= {
+            "/football-pulse/post/approved",
+            "/football-pulse/post/{postId}",
+            "/football-pulse/post/search",
+            "/football-pulse/auth/**"
+    };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -41,10 +48,7 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requestsConfigurer ->
                         requestsConfigurer
-                                .requestMatchers("/football-pulse/auth/sign-up",
-                                        "/football-pulse/post/approved",
-                                        "/football-pulse/post/{postId}",
-                                        "/football-pulse/post/search", "/football-pulse/auth/login").permitAll()
+                                .requestMatchers(permitAllUrls).permitAll()
 
                                 .requestMatchers("/football-pulse/post/**",
                                         "/football-pulse/email/**").authenticated()

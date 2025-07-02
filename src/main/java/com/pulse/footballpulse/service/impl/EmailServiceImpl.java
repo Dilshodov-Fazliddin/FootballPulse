@@ -4,7 +4,6 @@ import com.pulse.footballpulse.domain.EmailPostSubmissionDto;
 import com.pulse.footballpulse.domain.PostCreateDto;
 import com.pulse.footballpulse.domain.PostResponseDto;
 import com.pulse.footballpulse.entity.UserEntity;
-import com.pulse.footballpulse.entity.enums.PostStatus;
 import com.pulse.footballpulse.entity.enums.UserRoles;
 import com.pulse.footballpulse.exception.DataNotFoundException;
 import com.pulse.footballpulse.repository.UserRepository;
@@ -211,6 +210,36 @@ public class EmailServiceImpl implements EmailService {
             } catch (Exception e) {
                 log.error("Failed to send unblock message to {}: {}", email, e.getMessage());
             }
+        }
+    }
+
+    @Override
+    public void sendForgetPasswordConfirmationCode(String email,Integer code) {
+        UserEntity user = userRepository.findByMail(email).orElseThrow(() -> new DataNotFoundException("User not found"));
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject("Forget Password Confirmation Code");
+            message.setText(emailTemplateBuilder.buildForgetPasswordCodeBody(user.getFirstName(), code));
+            mailSender.send(message);
+            log.info("Forget password confirmation code sent");
+        } catch (Exception e) {
+            log.error("Failed to send forget password confirmation code to {}: {}", email, e.getMessage());
+        }
+    }
+
+    @Override
+    public void sendMessageAboutPasswordChanged(String email) {
+        UserEntity user = userRepository.findByMail(email).orElseThrow(() -> new DataNotFoundException("User not found"));
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject("Password Changed");
+            message.setText(emailTemplateBuilder.buildMessageAboutPasswordChanged(user.getFirstName()));
+            mailSender.send(message);
+            log.info("Password changed to {}", email);
+        } catch (Exception e) {
+            log.error("Failed to send message about password changed to {}: {}", email, e.getMessage());
         }
     }
 

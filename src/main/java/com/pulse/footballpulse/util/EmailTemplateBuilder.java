@@ -72,4 +72,15 @@ public class EmailTemplateBuilder {
                 "Your account unlocked" +"\n"+
                 "We hope you never do anything forbidden.";
     }
+
+    public String buildForgetPasswordCodeBody(String authorName, int code ) {
+        return "Dear " + authorName +"\n"+
+                "Do you want change your password ?" + "\n"+
+                "It is your code confirmation: " + code;
+    }
+
+    public String buildMessageAboutPasswordChanged(String authorName ) {
+        return "Dear " + authorName +"\n"+
+                "Your password successfully changed";
+    }
 }

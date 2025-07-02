@@ -3,6 +3,7 @@ package com.pulse.footballpulse.service.impl;
 import com.pulse.footballpulse.domain.LoginDto;
 import com.pulse.footballpulse.domain.UserCreateDto;
 import com.pulse.footballpulse.domain.response.ApiResponse;
+import com.pulse.footballpulse.domain.response.ForgetPasswordDto;
 import com.pulse.footballpulse.domain.response.JwtResponse;
 import com.pulse.footballpulse.entity.UserEntity;
 import com.pulse.footballpulse.exception.DataNotFoundException;
@@ -27,7 +28,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import java.util.Random;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -78,7 +78,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
 
-
     @Override
     @Transactional(readOnly = true)
     // Helper method to get the current user ID from a security context
@@ -113,6 +112,43 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         userRepository.save(user);
         return ResponseEntity.ok(ApiResponse.builder().status(200).message("User successfully unblocked").data(null).build());
     }
+
+
+    //Stage-1 Sent code
+    @Override
+    public ResponseEntity<ApiResponse<?>> setConfirmationCodeForNewPassword(String email) {
+        UserEntity user = userRepository.findByMail(email).orElseThrow(() -> new DataNotFoundException("User not found"));
+        int code=new Random().nextInt(1000, 9000);
+        user.setCode(code);
+
+        emailService.sendForgetPasswordConfirmationCode(user.getMail(),code);
+        userRepository.save(user);
+        return ResponseEntity.ok(ApiResponse.builder().data(null).message("We sent confirmation code, please check your mail address").status(200).build());
+    }
+
+    //Stage-2 Check code
+    @Override
+    public ResponseEntity<ApiResponse<?>> checkCodeConfirmationForNewPassword(ForgetPasswordDto forgetPasswordDto) {
+        userRepository.findByMailAndCode(forgetPasswordDto.getMail(), forgetPasswordDto.getCode()).orElseThrow(() ->
+                new NotAcceptableException("Your code is wrong, please try again!"));
+        return ResponseEntity.ok(ApiResponse.builder().data(null).message("code checked!").status(200).build());
+    }
+
+    //Stage-3 Set new Password
+    @Override
+    public ResponseEntity<ApiResponse<?>> setNewPassword(String email, String password) {
+        UserEntity user = userRepository.findByMail(email).orElseThrow(() -> new DataNotFoundException("User not found"));
+        if (passwordEncoder.matches(password, user.getPassword())) {
+            throw new NotAcceptableException("Your password are the same as the your old password, please try again and create a new password");
+        }else {
+            user.setCode(null);
+            user.setPassword(passwordEncoder.encode(password));
+            emailService.sendMessageAboutPasswordChanged(user.getMail());
+            userRepository.save(user);
+        }
+        return ResponseEntity.ok(ApiResponse.builder().data(null).status(200).message("Password updated congratulations").build());
+    }
+
 
 }
 
