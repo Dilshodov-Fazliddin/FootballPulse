@@ -114,17 +114,5 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return ResponseEntity.ok(ApiResponse.builder().status(200).message("User successfully unblocked").data(null).build());
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public UUID getCurrentUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-
-        Optional<UserEntity> user = userRepository.findByMail(email);
-        if (user.isEmpty()) {
-            throw new DataNotFoundException("User not found with email: " + email);
-        }
-        return user.get().getId();
-    }
 }
 
