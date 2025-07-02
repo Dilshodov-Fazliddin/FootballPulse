@@ -19,4 +19,6 @@ public interface EmailService {
 
     void sendInvitationEmail(String targetEmail, String inviterName, UUID teamId);
     void sendUnBlockOrBlockMessage(String email,boolean status);
+    void sendForgetPasswordConfirmationCode (String email,Integer code);
+    void sendMessageAboutPasswordChanged(String email);
 }
