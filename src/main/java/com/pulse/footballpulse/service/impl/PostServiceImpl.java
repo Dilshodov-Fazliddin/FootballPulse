@@ -5,13 +5,16 @@ import com.pulse.footballpulse.domain.PostResponseDto;
 import com.pulse.footballpulse.domain.PostUpdateDto;
 import com.pulse.footballpulse.domain.PostUpdateStatusDto;
 import com.pulse.footballpulse.entity.PostEntity;
+import com.pulse.footballpulse.entity.PostLikeEntity;
 import com.pulse.footballpulse.entity.UserEntity;
+import com.pulse.footballpulse.entity.enums.LikeType;
 import com.pulse.footballpulse.entity.enums.PostStatus;
 import com.pulse.footballpulse.entity.enums.UserRoles;
 import com.pulse.footballpulse.exception.DataNotFoundException;
 import com.pulse.footballpulse.exception.ForbiddenException;
 import com.pulse.footballpulse.mapper.PostMapper;
 import com.pulse.footballpulse.repository.PostRepository;
+import com.pulse.footballpulse.repository.PostLikeRepository;
 import com.pulse.footballpulse.repository.UserRepository;
 import com.pulse.footballpulse.event.PostStatusChangedEvent;
 import com.pulse.footballpulse.service.PostService;
@@ -23,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -32,6 +36,7 @@ import java.util.stream.Collectors;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
+    private final PostLikeRepository postLikeRepository;
     private final UserRepository userRepository;
     private final PostMapper postMapper;
     private final ApplicationEventPublisher eventPublisher;
@@ -178,8 +183,40 @@ public class PostServiceImpl implements PostService {
         PostEntity postEntity = postRepository.findById(postId)
                 .orElseThrow(() -> new DataNotFoundException("Post not found"));
 
-        // TODO: Implement like logic with user tracking to prevent duplicate likes
-        postEntity.setLikes(postEntity.getLikes() + 1);
+        // Check if user has already interacted with this post
+        Optional<PostLikeEntity> existingLike = postLikeRepository.findByPostIdAndUserId(postId, userId);
+
+        if (existingLike.isPresent()) {
+            PostLikeEntity postLike = existingLike.get();
+
+            if (postLike.getLikeType() == LikeType.LIKE) {
+                // User already liked this post, remove the like
+                postLikeRepository.delete(postLike);
+            } else {
+                // User had disliked, change to like
+                postLike.setLikeType(LikeType.LIKE);
+                postLikeRepository.save(postLike);
+            }
+        } else {
+            // User hasn't interacted with this post, create new like
+            UserEntity user = userRepository.findById(userId)
+                    .orElseThrow(() -> new DataNotFoundException("User not found"));
+
+            PostLikeEntity newLike = PostLikeEntity.builder()
+                    .post(postEntity)
+                    .user(user)
+                    .likeType(LikeType.LIKE)
+                    .build();
+
+            postLikeRepository.save(newLike);
+        }
+
+        // Update with accurate counts from the database
+        long likes = postLikeRepository.countByPostIdAndLikeType(postId, LikeType.LIKE);
+        long dislikes = postLikeRepository.countByPostIdAndLikeType(postId, LikeType.DISLIKE);
+
+        postEntity.setLikes((int) likes);
+        postEntity.setDislikes((int) dislikes);
         postRepository.save(postEntity);
     }
 
@@ -188,8 +225,40 @@ public class PostServiceImpl implements PostService {
         PostEntity postEntity = postRepository.findById(postId)
                 .orElseThrow(() -> new DataNotFoundException("Post not found"));
 
-        // TODO: Implement dislike logic with user tracking to prevent duplicate dislikes
-        postEntity.setDislikes(postEntity.getDislikes() + 1);
+        // Check if user has already interacted with this post
+        Optional<PostLikeEntity> existingLike = postLikeRepository.findByPostIdAndUserId(postId, userId);
+
+        if (existingLike.isPresent()) {
+            PostLikeEntity postLike = existingLike.get();
+
+            if (postLike.getLikeType() == LikeType.DISLIKE) {
+                // User already disliked this post, remove the dislike
+                postLikeRepository.delete(postLike);
+            } else {
+                // User had liked, change to dislike
+                postLike.setLikeType(LikeType.DISLIKE);
+                postLikeRepository.save(postLike);
+            }
+        } else {
+            // User hasn't interacted with this post, create new dislike
+            UserEntity user = userRepository.findById(userId)
+                    .orElseThrow(() -> new DataNotFoundException("User not found"));
+
+            PostLikeEntity newDislike = PostLikeEntity.builder()
+                    .post(postEntity)
+                    .user(user)
+                    .likeType(LikeType.DISLIKE)
+                    .build();
+
+            postLikeRepository.save(newDislike);
+        }
+
+        // Update with accurate counts from the database
+        long likes = postLikeRepository.countByPostIdAndLikeType(postId, LikeType.LIKE);
+        long dislikes = postLikeRepository.countByPostIdAndLikeType(postId, LikeType.DISLIKE);
+
+        postEntity.setLikes((int) likes);
+        postEntity.setDislikes((int) dislikes);
         postRepository.save(postEntity);
     }
 

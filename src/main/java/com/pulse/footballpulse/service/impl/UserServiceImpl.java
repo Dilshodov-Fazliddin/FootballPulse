@@ -77,6 +77,25 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return ResponseEntity.ok(ApiResponse.builder().status(200).message("User successfully verified").data(jwtTokenService.generateAccessToken(userRepository.save(user))).build());
     }
 
+
+
+    @Override
+    @Transactional(readOnly = true)
+    // Helper method to get the current user ID from a security context
+    public UUID getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // Get the email from authentication (UserEntity.getUsername() returns email)
+        String email = authentication.getName();
+
+        // Find a user by email and return their UUID
+        Optional<UserEntity> user = userRepository.findByMail(email);
+        if (user.isEmpty()) {
+            throw new DataNotFoundException("User not found with email: " + email);
+        }
+
+        return user.get().getId();
+    }
+
     @Override
     public ResponseEntity<ApiResponse<?>> block(UUID userId) {
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User not found"));
@@ -105,7 +124,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (user.isEmpty()) {
             throw new DataNotFoundException("User not found with email: " + email);
         }
-
         return user.get().getId();
     }
 }
