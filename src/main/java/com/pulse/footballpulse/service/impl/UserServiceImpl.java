@@ -45,37 +45,38 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public ResponseEntity<ApiResponse<?>> signUp(UserCreateDto userDto) {
-        if(userRepository.existsByMail(userDto.getMail()))
+        if (userRepository.existsByMail(userDto.getMail()))
             throw new NotAcceptableException("User already exists");
-        int code=new Random().nextInt(1000,9000);
+        int code = new Random().nextInt(1000, 9000);
         emailService.sendVerificationCode(userDto.getFirstName(), userDto.getMail(), code);
-        userRepository.save(userMapper.toEntity(userDto,code));
+        userRepository.save(userMapper.toEntity(userDto, code));
         return ResponseEntity.ok(ApiResponse.builder().message("User successfully created").status(200).data(null).build());
     }
 
 
     @Override
     public ResponseEntity<ApiResponse<?>> login(LoginDto loginDto) {
-       UserEntity user=userRepository.findByMail(loginDto.getMail()).orElseThrow(()->new DataNotFoundException("User not found"));
-       if (passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
-           if (user.getIsEnabled()) {
-               return ResponseEntity.ok(ApiResponse.builder()
-                       .data(JwtResponse.builder().token(jwtTokenService.generateAccessToken(user)).build())
-                       .message("Login in system")
-                       .status(200)
-                       .build());
-           }
-           throw new NotAcceptableException("Your account has blocked");
-       }
-       throw new NotAcceptableException("Your password is incorrect or you are not signed in");
+        UserEntity user = userRepository.findByMail(loginDto.getMail()).orElseThrow(() -> new DataNotFoundException("User not found"));
+        if (passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
+            if (user.getIsEnabled()) {
+                return ResponseEntity.ok(ApiResponse.builder()
+                        .data(JwtResponse.builder().token(jwtTokenService.generateAccessToken(user)).build())
+                        .message("Login in system")
+                        .status(200)
+                        .build());
+            }
+            throw new NotAcceptableException("Your account has blocked");
+        }
+        throw new NotAcceptableException("Your password is incorrect or you are not signed in");
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> verifyAccount (String email, Integer code) {
+    public ResponseEntity<ApiResponse<?>> verifyAccount(String email, Integer code) {
         UserEntity user = userRepository.findByMailAndCode(email, code).orElseThrow(() -> new DataNotFoundException("User not found"));
         user.setCode(null);
         return ResponseEntity.ok(ApiResponse.builder().status(200).message("User successfully verified").data(jwtTokenService.generateAccessToken(userRepository.save(user))).build());
     }
+
 
 
     @Override
@@ -99,7 +100,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public ResponseEntity<ApiResponse<?>> block(UUID userId) {
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User not found"));
         user.setIsEnabled(false);
-        emailService.sendUnBlockOrBlockMessage(user.getMail(),false);
+        emailService.sendUnBlockOrBlockMessage(user.getMail(), false);
         userRepository.save(user);
         return ResponseEntity.ok(ApiResponse.builder().status(200).message("User successfully blocked").data(null).build());
     }
@@ -108,8 +109,22 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public ResponseEntity<ApiResponse<?>> unBlock(UUID userId) {
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User not found"));
         user.setIsEnabled(true);
-        emailService.sendUnBlockOrBlockMessage(user.getMail(),true);
+        emailService.sendUnBlockOrBlockMessage(user.getMail(), true);
         userRepository.save(user);
         return ResponseEntity.ok(ApiResponse.builder().status(200).message("User successfully unblocked").data(null).build());
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UUID getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        Optional<UserEntity> user = userRepository.findByMail(email);
+        if (user.isEmpty()) {
+            throw new DataNotFoundException("User not found with email: " + email);
+        }
+        return user.get().getId();
+    }
 }
+
