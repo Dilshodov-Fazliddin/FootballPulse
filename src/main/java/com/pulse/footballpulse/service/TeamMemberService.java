@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface TeamMemberService {
     ResponseEntity<ApiResponse<?>> inviteMember(UUID teamId,TeamInviteDto dto,UserEntity requester);
     ResponseEntity<ApiResponse<?>> showTeamMembers(UUID teamId);
-    ResponseEntity<ApiResponse<?>> leaveTeam(UUID teamId,UUID memberId);
+    ResponseEntity<ApiResponse<?>> leaveTeam(UUID teamId,UserEntity member);
     ResponseEntity<ApiResponse<?>> deleteMember(UUID teamId, UUID memberId, UserEntity requester);
     ResponseEntity<ApiResponse<?>> joinTeam(UserEntity user,String inviteToken,UUID teamId);
 }

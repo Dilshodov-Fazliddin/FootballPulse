@@ -39,7 +39,17 @@ public class TeamController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<?>> getTeams(){
-        return teamService.getTeams();
+    public ResponseEntity<ApiResponse<?>> getTeams(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        return teamService.getTeams(page,size);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<?>> search(
+            @RequestParam String name
+    ){
+        return teamService.searchTeam(name);
     }
 }

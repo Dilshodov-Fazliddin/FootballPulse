@@ -6,6 +6,8 @@ import com.pulse.footballpulse.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class TeamMapper {
@@ -23,5 +25,11 @@ public class TeamMapper {
                 .name(team.getName())
                 .memberCount(team.getMembers() != null ? team.getMembers().size() : null)
                 .build();
+    }
+
+    public List<TeamResponse> toResponseList(List<TeamEntity> teams){
+        return teams.stream()
+                .map(this::toResponse)
+                .toList();
     }
 }
