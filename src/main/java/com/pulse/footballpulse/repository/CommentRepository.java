@@ -14,18 +14,6 @@ import com.pulse.footballpulse.entity.CommentEntity;
 
 @Repository
 public interface CommentRepository extends JpaRepository<CommentEntity,UUID> {
-    
-    //Find comments by postID using Pageable
-    Page<CommentEntity> findByPostID(UUID postID, Pageable pageable);
-    //Find comment by post
-    List<CommentEntity> findByPostID(UUID postID);
-
-    //Find comments by user
-    List<CommentEntity> findByUserID(UUID userID);
-
-    //Find comments by userID using Pageable
-    Page<CommentEntity> findByUserID(UUID userID, Pageable pageable);
-
     @Query("SELECT c FROM CommentEntity c WHERE c.post.id = :postId AND c.parentComment IS NULL")
     Page<CommentEntity> findRootCommentByPost(@Param("postId") UUID postId, Pageable pageable);
 

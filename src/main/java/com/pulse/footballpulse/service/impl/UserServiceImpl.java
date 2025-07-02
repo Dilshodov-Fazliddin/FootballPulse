@@ -97,13 +97,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     @Transactional(readOnly = true)
-    // Helper method to get the current user ID from a security context
     public UUID getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // Get the email from authentication (UserEntity.getUsername() returns email)
         String email = authentication.getName();
 
-        // Find a user by email and return their UUID
         Optional<UserEntity> user = userRepository.findByMail(email);
         if (user.isEmpty()) {
             throw new DataNotFoundException("User not found with email: " + email);
