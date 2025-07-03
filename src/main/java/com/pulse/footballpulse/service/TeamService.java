@@ -11,5 +11,6 @@ public interface TeamService {
     ResponseEntity<ApiResponse<?>> createTeam(String name, UserEntity user);
     ResponseEntity<ApiResponse<?>> editTeam(UUID id,String name);
     ResponseEntity<ApiResponse<?>> deleteTeam(UUID id);
-    ResponseEntity<ApiResponse<?>> getTeams();
+    ResponseEntity<ApiResponse<?>> getTeams(int page, int size);
+    ResponseEntity<ApiResponse<?>> searchTeam(String name);
 }

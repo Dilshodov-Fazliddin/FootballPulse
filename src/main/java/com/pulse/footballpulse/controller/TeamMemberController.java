@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.UUID;
 
 @RestController
@@ -33,5 +32,29 @@ public class TeamMemberController {
             @AuthenticationPrincipal UserEntity user
     ){
         return memberService.joinTeam(user, inviteToken, teamId);
+    }
+
+    @PutMapping("/{teamId}")
+    public ResponseEntity<ApiResponse<?>> leaveTeam(
+            @AuthenticationPrincipal UserEntity member,
+            @PathVariable UUID teamId
+    ){
+        return memberService.leaveTeam(teamId, member);
+    }
+
+    @DeleteMapping("/{teamId}/{memberId}")
+    public ResponseEntity<ApiResponse<?>> deleteMember(
+            @PathVariable UUID teamId,
+            @PathVariable UUID memberId,
+            @AuthenticationPrincipal UserEntity requester
+    ){
+        return memberService.deleteMember(teamId, memberId, requester);
+    }
+
+    @GetMapping("/{teamId}")
+    public ResponseEntity<ApiResponse<?>> showMembers(
+            @PathVariable UUID teamId
+    ){
+        return memberService.showTeamMembers(teamId);
     }
 }
