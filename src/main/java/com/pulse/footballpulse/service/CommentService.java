@@ -17,4 +17,7 @@ public interface CommentService {
     CommentDto getCommentById(UUID commentId);
     Page<CommentDto> getCommentsByPost(UUID postId, Pageable pageable);
     ThreadedCommentDto getCommentThread(UUID rootCommentId);
+    CommentDto likeComment(UUID commentId, UUID userId);
+    CommentDto dislikeComment(UUID commentId, UUID userId);
+    CommentDto replyToComment(UUID parentCommentId, CreateCommentDto dto, UUID userId);
 }

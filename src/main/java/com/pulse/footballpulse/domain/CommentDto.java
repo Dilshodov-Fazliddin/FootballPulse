@@ -1,5 +1,7 @@
 package com.pulse.footballpulse.domain;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
@@ -13,9 +15,17 @@ import lombok.Setter;
 public class CommentDto {
     private UUID id;
     private String comment;
+    private Integer likes;
+    private Integer dislikes;
+    private Boolean isEdited;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private UUID userId;
     private UUID postId;
     private UUID parentCommentId;
-    private Integer likeCount;
-    private Integer replyCount;
+    private String username;
+    
+   
+    
+    private List<CommentDto> replies;
 }
