@@ -61,9 +61,12 @@ public class FriendController {
     @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN', 'MODERATOR')")
     @GetMapping("/{userId}")
     public ResponseEntity<ApiResponse<Page<FriendResponseDto>>> getAllFriends(@PathVariable UUID userId,
-                                                                              @RequestParam(required = false, defaultValue = "10") int size, @RequestParam(required = false, defaultValue = "0") int page) {
+                                                                              @RequestParam(required = false) UUID friendId,
+                                                                              @RequestParam(required = false) FriendStatus friendStatus,
+                                                                              @RequestParam(required = false, defaultValue = "10") int size,
+                                                                              @RequestParam(required = false, defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<FriendResponseDto> friends = friendService.getFriends(pageable, userId);
+        Page<FriendResponseDto> friends = friendService.getFriends(pageable, userId, friendId, friendStatus);
 
         return ResponseEntity.ok(ApiResponse.<Page<FriendResponseDto>>builder()
                 .status(200)
@@ -72,18 +75,21 @@ public class FriendController {
                 .build());
     }
 
-    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN', 'MODERATOR')")
-    @GetMapping("/{userId}/status/{status}")
-    public ResponseEntity<ApiResponse<Page<FriendResponseDto>>> getByStatus(@PathVariable UUID userId,
-                                                                            @PathVariable FriendStatus status,
-                                                                            @RequestParam(required = false, defaultValue = "10") int size,
-                                                                            @RequestParam(required = false, defaultValue = "0") int page) {
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<Page<FriendResponseDto>>> searchAllFriends(@RequestParam(required = false) UUID userId,
+                                                                                 @RequestParam(required = false) UUID friendId,
+                                                                                 @RequestParam(required = false) FriendStatus friendStatus,
+                                                                                 @RequestParam(required = false, defaultValue = "10") int size,
+                                                                                 @RequestParam(required = false, defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<FriendResponseDto> friendResponseDtos = friendService.getByStatus(userId, status, pageable);
+        Page<FriendResponseDto> friends = friendService.getFriends(pageable, userId, friendId, friendStatus);
+
         return ResponseEntity.ok(ApiResponse.<Page<FriendResponseDto>>builder()
-                .message("Search results retrieved successfully")
-                .data(friendResponseDtos)
                 .status(200)
+                .message("Search results retrieved successfully")
+                .data(friends)
                 .build());
     }
 

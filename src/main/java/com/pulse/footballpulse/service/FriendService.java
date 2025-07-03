@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface FriendService {
     FriendResponseDto addFriend(FriendCreateDto friendCreateDto);
-    Page<FriendResponseDto> getFriends(Pageable pageable, UUID userId);
+    Page<FriendResponseDto> getFriends(Pageable pageable, UUID userId,UUID friendId,FriendStatus friendStatus);
 
     Page<FriendResponseDto> getByStatus(UUID userId, FriendStatus status, Pageable pageable);
 
