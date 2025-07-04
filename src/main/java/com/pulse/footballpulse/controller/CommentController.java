@@ -26,7 +26,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/comments")
+@RequestMapping("/football-pulse/comments")
 @RequiredArgsConstructor
 public class CommentController {
     

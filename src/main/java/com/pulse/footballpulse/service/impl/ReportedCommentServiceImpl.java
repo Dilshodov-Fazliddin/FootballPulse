@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class ReportedCommenServiceImpl implements ReportedCommentService {
+public class ReportedCommentServiceImpl implements ReportedCommentService {
 
     private final ReportedCommentRepository reportRepo;
     private final UserRepository userRepo;
@@ -45,7 +45,7 @@ public class ReportedCommenServiceImpl implements ReportedCommentService {
 
     @Override
     public List<ReportedCommentEntity> getUnresolvedReports() {
-        return reportRepo.findByResolveFalse();
+        return reportRepo.findByResolvedFalse();
     }
 
     @Override
