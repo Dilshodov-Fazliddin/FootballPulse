@@ -32,9 +32,9 @@ public class UserEntity extends BaseEntity implements UserDetails {
     private String birthday;
     @Enumerated(value = EnumType.STRING)
     private UserRoles role;
+    @Enumerated(value = EnumType.STRING)
     private Gender gender;
     private String imageUrl;
-    @Column(nullable = false)
     private String description;
     @Column(nullable = false)
     private String password;

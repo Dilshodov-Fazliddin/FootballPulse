@@ -6,6 +6,7 @@ import com.pulse.footballpulse.domain.response.ApiResponse;
 import com.pulse.footballpulse.domain.response.ForgetPasswordDto;
 import com.pulse.footballpulse.domain.response.JwtResponse;
 import com.pulse.footballpulse.entity.UserEntity;
+import com.pulse.footballpulse.entity.enums.Gender;
 import com.pulse.footballpulse.exception.DataNotFoundException;
 import com.pulse.footballpulse.exception.NotAcceptableException;
 import com.pulse.footballpulse.jwt.JwtTokenService;
@@ -14,6 +15,7 @@ import com.pulse.footballpulse.repository.UserRepository;
 import com.pulse.footballpulse.service.EmailService;
 import com.pulse.footballpulse.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,12 +26,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 import java.util.Random;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
@@ -118,10 +123,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public ResponseEntity<ApiResponse<?>> setConfirmationCodeForNewPassword(String email) {
         UserEntity user = userRepository.findByMail(email).orElseThrow(() -> new DataNotFoundException("User not found"));
-        int code=new Random().nextInt(1000, 9000);
+        int code = new Random().nextInt(1000, 9000);
         user.setCode(code);
 
-        emailService.sendForgetPasswordConfirmationCode(user.getMail(),code);
+        emailService.sendForgetPasswordConfirmationCode(user.getMail(), code);
         userRepository.save(user);
         return ResponseEntity.ok(ApiResponse.builder().data(null).message("We sent confirmation code, please check your mail address").status(200).build());
     }
@@ -140,7 +145,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         UserEntity user = userRepository.findByMail(email).orElseThrow(() -> new DataNotFoundException("User not found"));
         if (passwordEncoder.matches(password, user.getPassword())) {
             throw new NotAcceptableException("Your password are the same as the your old password, please try again and create a new password");
-        }else {
+        } else {
             user.setCode(null);
             user.setPassword(passwordEncoder.encode(password));
             emailService.sendMessageAboutPasswordChanged(user.getMail());
@@ -149,6 +154,81 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return ResponseEntity.ok(ApiResponse.builder().data(null).status(200).message("Password updated congratulations").build());
     }
 
+    @Override
+    public ResponseEntity<ApiResponse<?>> dynamicUpdateUserProfile(UUID id, Map<String, Object> updates) {
+        UserEntity user = userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("User not found"));
+
+        updates.forEach((key, value) -> {
+            switch (key) {
+                case "email":
+                    user.setMail((String) value);
+                    log.info("User {}: updated email to '{}'", id, value);
+                    break;
+                case "firstName":
+                    user.setFirstName((String) value);
+                    log.info("User {}: updated firstName to '{}'", id, value);
+                    break;
+                case "lastName":
+                    user.setLastName((String) value);
+                    log.info("User {}: updated lastName to '{}'", id, value);
+                    break;
+                case "birthday":
+                    user.setBirthday((String) value);
+                    log.info("User {}: updated birthday to '{}'", id, value);
+                    break;
+                case "gender":
+                    if (value instanceof String strGender) {
+                        user.setGender(Gender.valueOf(strGender.toUpperCase()));
+                    } else if (value instanceof Gender gender) {
+                        user.setGender(gender);
+                        log.info("User {}: updated Gender to '{}'", id, value);
+                    } else {
+                        throw new IllegalArgumentException("Invalid gender type");
+                    }
+                    break;
+                case "imageUrl":
+                    user.setImageUrl((String) value);
+                    log.info("User {}: updated image to '{}'", id, value);
+                    break;
+                case "description":
+                    log.info("User {}: updated description to '{}'", id, value);
+                    user.setDescription((String) value);
+                    break;
+                case "password":
+                    log.info("User {}: updated password to '{}'", id, value);
+                    user.setPassword(passwordEncoder.encode((String) value));
+                    break;
+                case "mail":
+                    user.setMail((String) value);
+                    log.info("User {}: updated mail to '{}'", id, value);
+                    break;
+                case "username":
+                    user.setUsername((String) value);
+                    log.info("User {}: updated username to '{}'", id, value);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Field '" + key + "' is not allowed to update");
+            }
+        });
+
+        userRepository.save(user);
+        return ResponseEntity.ok(ApiResponse.builder().data(null).message("User profile updated").status(200).build());
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<?>> getProfile(Principal principal) {
+        UserEntity user = userRepository.findByMail(principal.getName()).orElseThrow(() -> new NotAcceptableException("User not found"));
+        UserCreateDto userCreateDto = new UserCreateDto();
+        userCreateDto.setFirstName(user.getFirstName());
+        userCreateDto.setLastName(user.getLastName());
+        userCreateDto.setBirthday(user.getBirthday());
+        userCreateDto.setGender(user.getGender());
+        userCreateDto.setImageUrl(user.getImageUrl());
+        userCreateDto.setDescription(user.getDescription());
+        userCreateDto.setUsername(user.getUsername());
+        userCreateDto.setMail(user.getMail());
+        return ResponseEntity.ok(ApiResponse.builder().data(userCreateDto).status(200).build());
+    }
 
 }
 

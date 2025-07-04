@@ -10,5 +10,5 @@ import com.pulse.footballpulse.entity.ReportedCommentEntity;
 
 @Repository
 public interface ReportedCommentRepository extends JpaRepository<ReportedCommentEntity,UUID> {
-    List<ReportedCommentEntity> findByResolveFalse();
+    List<ReportedCommentEntity> findByResolvedFalse();
 }
