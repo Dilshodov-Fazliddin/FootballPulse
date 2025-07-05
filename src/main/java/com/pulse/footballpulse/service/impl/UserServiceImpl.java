@@ -217,18 +217,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public ResponseEntity<ApiResponse<?>> getProfile(Principal principal) {
-        UserEntity user = userRepository.findByMail(principal.getName()).orElseThrow(() -> new NotAcceptableException("User not found"));
-        UserCreateDto userCreateDto = new UserCreateDto();
-        userCreateDto.setFirstName(user.getFirstName());
-        userCreateDto.setLastName(user.getLastName());
-        userCreateDto.setBirthday(user.getBirthday());
-        userCreateDto.setGender(user.getGender());
-        userCreateDto.setImageUrl(user.getImageUrl());
-        userCreateDto.setDescription(user.getDescription());
-        userCreateDto.setUsername(user.getUsername());
-        userCreateDto.setMail(user.getMail());
-        return ResponseEntity.ok(ApiResponse.builder().data(userCreateDto).status(200).build());
+        return ResponseEntity.ok(ApiResponse.builder().data(userMapper.getProfile(principal.getName())).status(200).build());
     }
+
 
 }
 
