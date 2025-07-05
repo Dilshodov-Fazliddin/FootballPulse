@@ -17,12 +17,12 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/sign-up")
-    public ResponseEntity<ApiResponse<?>> signUp(@RequestBody UserCreateDto userCreateDto) {
+    public ResponseEntity<ApiResponse<?>> signUp(@Valid @RequestBody UserCreateDto userCreateDto) {
         return userService.signUp(userCreateDto);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<?>> login(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<ApiResponse<?>> login(@Valid @RequestBody LoginDto loginDto) {
         return userService.login(loginDto);
     }
 
