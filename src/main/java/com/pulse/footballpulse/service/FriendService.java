@@ -22,4 +22,8 @@ public interface FriendService {
     void deleteById(UUID id);
 
     FriendResponseDto updateFriend(UUID id, FriendUpdateDto updateDto);
+
+    FriendResponseDto getFriend(UUID id);
+
+
 }

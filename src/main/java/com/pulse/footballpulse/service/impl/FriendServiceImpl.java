@@ -33,11 +33,11 @@ public class FriendServiceImpl implements FriendService {
     }
 
     @Override
-    public Page<FriendResponseDto> getFriends(Pageable pageable, UUID userId,UUID friendId,FriendStatus friendStatus) {
+    public Page<FriendResponseDto> getFriends(Pageable pageable, UUID userId, UUID friendId, FriendStatus friendStatus) {
         Specification<FriendEntity> spec =
                 FriendSpecification.hasUser(userId)
-                .and(FriendSpecification.hasFriend(friendId))
-                .and(FriendSpecification.hasStatus(friendStatus));
+                        .and(FriendSpecification.hasFriend(friendId))
+                        .and(FriendSpecification.hasStatus(friendStatus));
 
 
         Page<FriendEntity> all = friendRepository.findAll(spec, pageable);
@@ -78,6 +78,12 @@ public class FriendServiceImpl implements FriendService {
         FriendEntity friendEntity = friendRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Friend request not found with the id " + id));
         friendEntity.setStatus(updateDto.getStatus());
         friendRepository.save(friendEntity);
+        return friendMapper.toFriendResponse(friendEntity);
+    }
+
+    @Override
+    public FriendResponseDto getFriend(UUID id) {
+        FriendEntity friendEntity = friendRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Friend request not found with the id " + id));
         return friendMapper.toFriendResponse(friendEntity);
     }
 
