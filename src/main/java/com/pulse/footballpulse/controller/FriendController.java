@@ -6,6 +6,7 @@ import com.pulse.footballpulse.domain.response.ApiResponse;
 import com.pulse.footballpulse.domain.response.FriendResponseDto;
 import com.pulse.footballpulse.entity.enums.FriendStatus;
 import com.pulse.footballpulse.service.FriendService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +25,7 @@ public class FriendController {
 
     @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB')")
     @PostMapping("send")
-    public ResponseEntity<ApiResponse<FriendResponseDto>> addFriend(@RequestBody FriendCreateDto friendCreateDto) {
+    public ResponseEntity<ApiResponse<FriendResponseDto>> addFriend(@RequestBody @Valid FriendCreateDto friendCreateDto) {
         FriendResponseDto responseDto = friendService.addFriend(friendCreateDto);
         return ResponseEntity.ok(ApiResponse.<FriendResponseDto>builder()
                 .status(201)
@@ -59,11 +60,26 @@ public class FriendController {
     }
 
     @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN', 'MODERATOR')")
-    @GetMapping("/{userId}")
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<FriendResponseDto>> getFriend(@PathVariable UUID id) {
+        FriendResponseDto responseDto = friendService.getFriend(id);
+        return ResponseEntity.ok(ApiResponse.<FriendResponseDto>builder()
+                .message("get friend entity successfully")
+                .status(200)
+                .data(responseDto)
+                .build());
+    }
+
+
+    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN', 'MODERATOR')")
+    @GetMapping("userId/{userId}")
     public ResponseEntity<ApiResponse<Page<FriendResponseDto>>> getAllFriends(@PathVariable UUID userId,
-                                                                              @RequestParam(required = false, defaultValue = "10") int size, @RequestParam(required = false, defaultValue = "0") int page) {
+                                                                              @RequestParam(required = false) UUID friendId,
+                                                                              @RequestParam(required = false) FriendStatus friendStatus,
+                                                                              @RequestParam(required = false, defaultValue = "10") int size,
+                                                                              @RequestParam(required = false, defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<FriendResponseDto> friends = friendService.getFriends(pageable, userId);
+        Page<FriendResponseDto> friends = friendService.getFriends(pageable, userId, friendId, friendStatus);
 
         return ResponseEntity.ok(ApiResponse.<Page<FriendResponseDto>>builder()
                 .status(200)
@@ -72,18 +88,21 @@ public class FriendController {
                 .build());
     }
 
-    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN', 'MODERATOR')")
-    @GetMapping("/{userId}/status/{status}")
-    public ResponseEntity<ApiResponse<Page<FriendResponseDto>>> getByStatus(@PathVariable UUID userId,
-                                                                            @PathVariable FriendStatus status,
-                                                                            @RequestParam(required = false, defaultValue = "10") int size,
-                                                                            @RequestParam(required = false, defaultValue = "0") int page) {
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<Page<FriendResponseDto>>> searchAllFriends(@RequestParam(required = false) UUID userId,
+                                                                                 @RequestParam(required = false) UUID friendId,
+                                                                                 @RequestParam(required = false) FriendStatus friendStatus,
+                                                                                 @RequestParam(required = false, defaultValue = "10") int size,
+                                                                                 @RequestParam(required = false, defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<FriendResponseDto> friendResponseDtos = friendService.getByStatus(userId, status, pageable);
+        Page<FriendResponseDto> friends = friendService.getFriends(pageable, userId, friendId, friendStatus);
+
         return ResponseEntity.ok(ApiResponse.<Page<FriendResponseDto>>builder()
-                .message("Search results retrieved successfully")
-                .data(friendResponseDtos)
                 .status(200)
+                .message("Search results retrieved successfully")
+                .data(friends)
                 .build());
     }
 
@@ -102,7 +121,7 @@ public class FriendController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<FriendResponseDto>> updateFriend(
             @PathVariable UUID id,
-            @RequestBody FriendUpdateDto updateDto) {
+            @RequestBody @Valid FriendUpdateDto updateDto) {
 
         FriendResponseDto updated = friendService.updateFriend(id, updateDto);
         return ResponseEntity.ok(

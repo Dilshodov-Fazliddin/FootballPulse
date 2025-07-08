@@ -9,10 +9,12 @@ import com.pulse.footballpulse.exception.DataNotFoundException;
 import com.pulse.footballpulse.mapper.FriendMapper;
 import com.pulse.footballpulse.repository.FriendRepository;
 import com.pulse.footballpulse.service.FriendService;
+import com.pulse.footballpulse.specification.FriendSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -31,8 +33,14 @@ public class FriendServiceImpl implements FriendService {
     }
 
     @Override
-    public Page<FriendResponseDto> getFriends(Pageable pageable, UUID userId) {
-        Page<FriendEntity> all = friendRepository.findAllByUserId(userId, pageable);
+    public Page<FriendResponseDto> getFriends(Pageable pageable, UUID userId, UUID friendId, FriendStatus friendStatus) {
+        Specification<FriendEntity> spec =
+                FriendSpecification.hasUser(userId)
+                        .and(FriendSpecification.hasFriend(friendId))
+                        .and(FriendSpecification.hasStatus(friendStatus));
+
+
+        Page<FriendEntity> all = friendRepository.findAll(spec, pageable);
         return all.map(friendMapper::toFriendResponse);
     }
 
@@ -70,6 +78,12 @@ public class FriendServiceImpl implements FriendService {
         FriendEntity friendEntity = friendRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Friend request not found with the id " + id));
         friendEntity.setStatus(updateDto.getStatus());
         friendRepository.save(friendEntity);
+        return friendMapper.toFriendResponse(friendEntity);
+    }
+
+    @Override
+    public FriendResponseDto getFriend(UUID id) {
+        FriendEntity friendEntity = friendRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Friend request not found with the id " + id));
         return friendMapper.toFriendResponse(friendEntity);
     }
 
