@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/reports/comments")
 @RequiredArgsConstructor
-public class ReportedCommenController {
+public class ReportedCommentController {
     
     private final ReportedCommentService reportService;
 

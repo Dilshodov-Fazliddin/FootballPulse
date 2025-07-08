@@ -32,7 +32,10 @@ public class SecurityConfiguration {
             "/football-pulse/post/approved",
             "/football-pulse/post/{postId}",
             "/football-pulse/post/search",
-            "/football-pulse/auth/**"
+            "/football-pulse/auth/**",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
     };
 
     @Bean
@@ -49,7 +52,6 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(requestsConfigurer ->
                         requestsConfigurer
                                 .requestMatchers(permitAllUrls).permitAll()
-
                                 .requestMatchers("/football-pulse/post/**",
                                         "/football-pulse/email/**").authenticated()
                                 .anyRequest().authenticated()
