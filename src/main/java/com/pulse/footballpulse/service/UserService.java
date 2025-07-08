@@ -2,8 +2,11 @@ package com.pulse.footballpulse.service;
 
 import com.pulse.footballpulse.domain.LoginDto;
 import com.pulse.footballpulse.domain.UserCreateDto;
+import com.pulse.footballpulse.domain.UsersDto;
 import com.pulse.footballpulse.domain.response.ApiResponse;
 import com.pulse.footballpulse.domain.response.ForgetPasswordDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -24,4 +27,5 @@ public interface UserService {
     ResponseEntity<ApiResponse<?>>setNewPassword(String email, String password);
     ResponseEntity<ApiResponse<?>>dynamicUpdateUserProfile(UUID id, Map<String,Object> updates);
     ResponseEntity<ApiResponse<?>>getProfile(Principal principal);
+    ResponseEntity<ApiResponse<Page<UsersDto>>> getAllUsers(Pageable pageable);
 }

@@ -2,6 +2,7 @@ package com.pulse.footballpulse.service.impl;
 
 import com.pulse.footballpulse.domain.LoginDto;
 import com.pulse.footballpulse.domain.UserCreateDto;
+import com.pulse.footballpulse.domain.UsersDto;
 import com.pulse.footballpulse.domain.response.ApiResponse;
 import com.pulse.footballpulse.domain.response.ForgetPasswordDto;
 import com.pulse.footballpulse.domain.response.JwtResponse;
@@ -16,6 +17,8 @@ import com.pulse.footballpulse.service.EmailService;
 import com.pulse.footballpulse.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,11 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-
-import java.util.Random;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -220,6 +219,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return ResponseEntity.ok(ApiResponse.builder().data(userMapper.getProfile(principal.getName())).status(200).build());
     }
 
+    @Override
+    public ResponseEntity<ApiResponse<Page<UsersDto>>> getAllUsers(Pageable pageable) {
+        Page<UserEntity> allUsers = userRepository.findAll(pageable);
+        Page<UsersDto> users= allUsers.map(userEntity -> new UsersDto(
+                userEntity.getFirstName(),
+                userEntity.getLastName(),
+                userEntity.getMail(),
+                userEntity.getBirthday()
+                ,userEntity.getGender().name(),
+                userEntity.getUsername(),
+                userEntity.getRole())
+        );
+        return ResponseEntity.ok(ApiResponse.<Page<UsersDto>>builder().status(200).data(users).message("all users").build());
+    }
 
 }
 

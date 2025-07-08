@@ -1,8 +1,12 @@
 package com.pulse.footballpulse.controller;
 
+import com.pulse.footballpulse.domain.UsersDto;
 import com.pulse.footballpulse.domain.response.ApiResponse;
 import com.pulse.footballpulse.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -42,6 +46,14 @@ public class UserController {
     @PreAuthorize("hasAnyRole('USER','AUTHOR','ADMIN','MODERATOR','CLUB')")
     public ResponseEntity<ApiResponse<?>> getUserProfile(Principal principal){
         return userService.getProfile(principal);
+    }
+
+    @GetMapping("/all-users")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Page<UsersDto>>> getAllUsers(@RequestParam(defaultValue = "0")int page,
+                                                                   @RequestParam(defaultValue = "10")int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return userService.getAllUsers(pageable);
     }
 }
 
