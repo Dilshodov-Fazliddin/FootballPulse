@@ -46,7 +46,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
     public ResponseEntity<ApiResponse<?>> showTeamMembers(UUID teamId) {
         List<TeamMemberEntity> members = teamMemberRepository.findByTeam(teamId);
         List<TeamMemberResponse> response = mapper.toResponseList(members);
-        return ResponseEntity.ok(ApiResponse.builder().message("Success").data(null).status(200).build());
+        return ResponseEntity.ok(ApiResponse.builder().message("Success").data(response).status(200).build());
     }
 
     @Override
