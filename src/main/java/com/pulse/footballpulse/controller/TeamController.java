@@ -15,13 +15,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/football-pulse/teams")
 @RequiredArgsConstructor
-@Tag(name = "Team api",description = "Guruh va uni boshqarish uchun api endpointlar")
+@Tag(name = "Team api",description = "Teams and endpoints for managing them")
 public class TeamController {
     private final TeamService teamService;
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_USER')")
-    @Operation(summary = "Yangi guruh yaratish")
+    @Operation(summary = "Create new team")
     public ResponseEntity<ApiResponse<?>> createTeam(
             @RequestParam String name,
             @AuthenticationPrincipal UserEntity user
@@ -31,7 +31,7 @@ public class TeamController {
 
     @PutMapping("/{teamId}")
     @PreAuthorize("hasRole('ROLE_CLUB')")
-    @Operation(summary = "Guruhni tahrirlash uchun",description = "Faqat guruh admini guruhni tahrirlay oladi")
+    @Operation(summary = "Update team",description = "Only team owner")
     public ResponseEntity<ApiResponse<?>> updateTeam(
             @RequestParam String newName,
             @PathVariable UUID teamId
@@ -41,7 +41,7 @@ public class TeamController {
 
     @DeleteMapping("/{teamId}")
     @PreAuthorize("hasAnyRole('ROLE_CLUB','ROLE_ADMIN','ROLE_MODERATOR')")
-    @Operation(summary = "Guruhni o'chirish",description = "Guruhni o'chirish. Biror muammo yoki nojoiz chatlar uchun admin va moderator ham o'chirishi mumkin")
+    @Operation(summary = "Delete team",description = "Delete a team. Admins and moderators can also delete a group for any problems or inappropriate chats.")
     public ResponseEntity<ApiResponse<?>> deleteTeam(
             @PathVariable UUID teamId
     ){
@@ -50,7 +50,7 @@ public class TeamController {
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @Operation(summary = "Barcha guruhlar ro'yxatini ko'rish",description = "faqat admin uchun")
+    @Operation(summary = "Show all teams",description = "Only admin")
     public ResponseEntity<ApiResponse<?>> getTeams(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -59,7 +59,7 @@ public class TeamController {
     }
 
     @GetMapping("/search")
-    @Operation(summary = "Nomi bo'yicha guruhlarni qidirish",description = "hamma uchun ochiq")
+    @Operation(summary = "Search teams by name",description = "Open for anyone")
     public ResponseEntity<ApiResponse<?>> search(
             @RequestParam String name
     ){
