@@ -154,7 +154,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendInvitationEmail(String targetEmail, String inviterName, UUID teamId) {
         String inviteToken = generateUniqueToken();
-        String joinLink = "http://localhost:8080/football-pulse/team-member/join?teamId=" + teamId + "&token=" + inviteToken;
+        String joinLink = "http://localhost:8080/football-pulse/team-member/join?teamId=" + teamId + "&inviteToken=" + inviteToken;
 
         String subject = "Team Invitation - Football Pulse";
         String content = """

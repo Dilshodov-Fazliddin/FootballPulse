@@ -3,16 +3,22 @@ package com.pulse.footballpulse.service.impl;
 import com.pulse.footballpulse.domain.response.ApiResponse;
 import com.pulse.footballpulse.domain.response.TeamResponse;
 import com.pulse.footballpulse.entity.TeamEntity;
+import com.pulse.footballpulse.entity.TeamMemberEntity;
 import com.pulse.footballpulse.entity.UserEntity;
+import com.pulse.footballpulse.entity.enums.RoleInTeam;
+import com.pulse.footballpulse.entity.enums.UserRoles;
 import com.pulse.footballpulse.exception.DataNotFoundException;
 import com.pulse.footballpulse.mapper.TeamMapper;
+import com.pulse.footballpulse.repository.TeamMemberRepository;
 import com.pulse.footballpulse.repository.TeamRepository;
+import com.pulse.footballpulse.repository.UserRepository;
 import com.pulse.footballpulse.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,12 +27,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TeamServiceImpl implements TeamService {
     private final TeamRepository teamRepository;
+    private final TeamMemberRepository teamMemberRepository;
+    private final UserRepository userRepository;
     private final TeamMapper mapper;
 
     @Override
     public ResponseEntity<ApiResponse<?>> createTeam(String name, UserEntity user) {
-        TeamEntity newTeam = mapper.toEntity(name, user);
-        teamRepository.save(newTeam);
+        TeamEntity newTeam = teamRepository.save(mapper.toEntity(name, user));
+        createMember(newTeam,user);
         return ResponseEntity.ok(ApiResponse.builder().data(null).message("Team created").status(200).build());
     }
 
@@ -62,5 +70,18 @@ public class TeamServiceImpl implements TeamService {
     private TeamEntity getById(UUID id) {
         return teamRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("Team not found"));
+    }
+
+    @Transactional
+    TeamMemberEntity createMember(TeamEntity team, UserEntity user){
+        TeamMemberEntity member = TeamMemberEntity.builder()
+                .role(RoleInTeam.CAPITAN)
+                .user(user)
+                .team(team)
+                .build();
+        user.setRole(UserRoles.ROLE_CLUB);
+        userRepository.save(user);
+
+        return teamMemberRepository.save(member);
     }
 }
