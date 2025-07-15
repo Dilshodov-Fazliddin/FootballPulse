@@ -8,6 +8,7 @@ import com.pulse.footballpulse.domain.response.ForgetPasswordDto;
 import com.pulse.footballpulse.domain.response.JwtResponse;
 import com.pulse.footballpulse.entity.UserEntity;
 import com.pulse.footballpulse.entity.enums.Gender;
+import com.pulse.footballpulse.entity.enums.UserRoles;
 import com.pulse.footballpulse.exception.DataNotFoundException;
 import com.pulse.footballpulse.exception.NotAcceptableException;
 import com.pulse.footballpulse.jwt.JwtTokenService;
@@ -215,6 +216,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public ResponseEntity<ApiResponse<?>> updateUserRole(UUID id, UserRoles role) {
+        UserEntity user = userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("User not found"));
+        user.setRole(role);
+        userRepository.save(user);
+        return ResponseEntity.ok(ApiResponse.builder().data(null).message("User role updated").status(200).build());
+    }
+
+    @Override
     public ResponseEntity<ApiResponse<?>> getProfile(Principal principal) {
         return ResponseEntity.ok(ApiResponse.builder().data(userMapper.getProfile(principal.getName())).status(200).build());
     }
@@ -226,13 +235,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 userEntity.getFirstName(),
                 userEntity.getLastName(),
                 userEntity.getMail(),
-                userEntity.getBirthday()
-                ,userEntity.getGender().name(),
+                userEntity.getBirthday(),
+                userEntity.getGender().name(),
                 userEntity.getUsername(),
                 userEntity.getRole())
         );
         return ResponseEntity.ok(ApiResponse.<Page<UsersDto>>builder().status(200).data(users).message("all users").build());
     }
-
 }
 
