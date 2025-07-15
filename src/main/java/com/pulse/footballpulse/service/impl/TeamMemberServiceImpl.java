@@ -55,7 +55,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
                 .findByUserIdAndTeamId(member.getId(), teamId)
                 .orElseThrow(() -> new DataNotFoundException("Member not found"));
         teamMemberRepository.delete(teamMember);
-        return response("Left team", HttpStatus.OK);
+        return response("Left the team", HttpStatus.OK);
     }
 
     @Override

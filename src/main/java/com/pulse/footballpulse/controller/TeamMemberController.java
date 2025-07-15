@@ -18,13 +18,14 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/football-pulse/team-member")
 @RequiredArgsConstructor
-@Tag(name = "Member api",description = "Guruh a'zolarini boshqarish uchun api endpointlar")
+@Tag(name = "Member api",description = "Team members and endpoints for managing them")
 public class TeamMemberController {
     private final TeamMemberService teamMemberService;
 
     @PostMapping("/invite/{teamId}")
     @PreAuthorize("hasRole('ROLE_CLUB')")
-    @Operation(summary = "Invite people",description = "Qo'shilishi kerak azo saytda mavjud bo'lishi va faol bo'lishi lozim")
+    @Operation(summary = "Invite member",description = "Must be added, must be available on the site and active")
+
     public ResponseEntity<ApiResponse<?>> inviteMember(
             @Valid @RequestBody TeamInviteDto dto,
             @AuthenticationPrincipal UserEntity requester,
@@ -34,7 +35,7 @@ public class TeamMemberController {
     }
 
     @PostMapping("/join-team")
-    @Operation(summary = "Guruhga qo'shilish",description = "Email uchun dinamik url. Saytda ko'rsatilmaydi")
+    @Operation(summary = "Join team",description = "Dynamic URL for email. Not displayed on the site.")
     public ResponseEntity<ApiResponse<?>> joinTeam(
             @RequestParam UUID teamId,
             @RequestParam String inviteToken,
@@ -45,7 +46,7 @@ public class TeamMemberController {
 
     @PutMapping("/{teamId}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    @Operation(summary = "Guruhdan chiqish",description = "Guruh admini guruhdan chiqa olmaydi")
+    @Operation(summary = "Leave the team",description = "Group admin cannot leave the group")
     public ResponseEntity<ApiResponse<?>> leaveTeam(
             @AuthenticationPrincipal UserEntity member,
             @PathVariable UUID teamId
@@ -55,7 +56,7 @@ public class TeamMemberController {
 
     @DeleteMapping("/{teamId}/{memberId}")
     @PreAuthorize("hasRole('ROLE_CLUB')")
-    @Operation(summary = "Azoni o'chirish",description = "Faqat guruh admini o'chira oladi")
+    @Operation(summary = "Delete member",description = "Only team owner")
     public ResponseEntity<ApiResponse<?>> deleteMember(
             @PathVariable UUID teamId,
             @PathVariable UUID memberId,
@@ -65,7 +66,7 @@ public class TeamMemberController {
     }
 
     @GetMapping("/{teamId}")
-    @Operation(summary = "Guruhdagi azolarni ko'rish")
+    @Operation(summary = "Show team members")
     public ResponseEntity<ApiResponse<?>> showMembers(
             @PathVariable UUID teamId
     ){
