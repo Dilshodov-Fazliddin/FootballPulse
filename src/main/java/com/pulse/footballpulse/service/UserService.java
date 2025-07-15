@@ -5,6 +5,7 @@ import com.pulse.footballpulse.domain.UserCreateDto;
 import com.pulse.footballpulse.domain.UsersDto;
 import com.pulse.footballpulse.domain.response.ApiResponse;
 import com.pulse.footballpulse.domain.response.ForgetPasswordDto;
+import com.pulse.footballpulse.entity.enums.UserRoles;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,8 @@ public interface UserService {
     ResponseEntity<ApiResponse<?>>checkCodeConfirmationForNewPassword(ForgetPasswordDto forgetPasswordDto);
     ResponseEntity<ApiResponse<?>>setNewPassword(String email, String password);
     ResponseEntity<ApiResponse<?>>dynamicUpdateUserProfile(UUID id, Map<String,Object> updates);
+    ResponseEntity<ApiResponse<?>>updateUserRole(UUID id, UserRoles role);
     ResponseEntity<ApiResponse<?>>getProfile(Principal principal);
     ResponseEntity<ApiResponse<Page<UsersDto>>> getAllUsers(Pageable pageable);
+
 }

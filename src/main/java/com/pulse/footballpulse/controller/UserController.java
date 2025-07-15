@@ -2,6 +2,7 @@ package com.pulse.footballpulse.controller;
 
 import com.pulse.footballpulse.domain.UsersDto;
 import com.pulse.footballpulse.domain.response.ApiResponse;
+import com.pulse.footballpulse.entity.enums.UserRoles;
 import com.pulse.footballpulse.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -55,5 +56,12 @@ public class UserController {
         Pageable pageable = PageRequest.of(page, size);
         return userService.getAllUsers(pageable);
     }
+
+    @PutMapping("/role/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<?>> updateUserRole(@PathVariable UUID id, @RequestParam UserRoles role){
+        return userService.updateUserRole(id, role);
+    }
+
 }
 
