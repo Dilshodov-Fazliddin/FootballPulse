@@ -38,13 +38,13 @@ public class UserController {
     }
 
     @PutMapping("/update/{userId}")
-    @PreAuthorize("hasAnyRole('USER','AUTHOR','ADMIN','MODERATOR','CLUB')")
+    @PreAuthorize("hasAnyRole('USER','AUTHOR','ADMIN','CLUB')")
     public ResponseEntity<ApiResponse<?>> updateUser(@PathVariable UUID userId, @RequestBody Map<String, Object>updates){
         return userService.dynamicUpdateUserProfile(userId,updates);
     }
 
     @GetMapping("/profile")
-    @PreAuthorize("hasAnyRole('USER','AUTHOR','ADMIN','MODERATOR','CLUB')")
+    @PreAuthorize("hasAnyRole('USER','AUTHOR','ADMIN','CLUB')")
     public ResponseEntity<ApiResponse<?>> getUserProfile(Principal principal){
         return userService.getProfile(principal);
     }

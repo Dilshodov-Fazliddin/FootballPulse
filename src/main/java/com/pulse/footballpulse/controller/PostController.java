@@ -89,7 +89,7 @@ public class PostController {
     // User endpoints (like/dislike functionality)
 
     @PostMapping("/{postId}/like")
-    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN', 'MODERATOR')")
+    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN')")
     public ResponseEntity<ApiResponse<String>> likePost(@PathVariable UUID postId) {
         UUID userId = userService.getCurrentUserId();
         postService.likePost(postId, userId);
@@ -101,7 +101,7 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/dislike")
-    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN', 'MODERATOR')")
+    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN')")
     public ResponseEntity<ApiResponse<String>> dislikePost(@PathVariable UUID postId) {
         UUID userId = userService.getCurrentUserId();
         postService.dislikePost(postId, userId);

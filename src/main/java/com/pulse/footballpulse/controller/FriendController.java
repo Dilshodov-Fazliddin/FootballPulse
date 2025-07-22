@@ -59,7 +59,7 @@ public class FriendController {
 
     }
 
-    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN', 'MODERATOR')")
+    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<FriendResponseDto>> getFriend(@PathVariable UUID id) {
         FriendResponseDto responseDto = friendService.getFriend(id);
@@ -71,7 +71,7 @@ public class FriendController {
     }
 
 
-    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN', 'MODERATOR')")
+    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN')")
     @GetMapping("userId/{userId}")
     public ResponseEntity<ApiResponse<Page<FriendResponseDto>>> getAllFriends(@PathVariable UUID userId,
                                                                               @RequestParam(required = false) UUID friendId,

@@ -70,21 +70,6 @@ public class DataLoaderConfiguration implements CommandLineRunner {
                     .isAccountNonLocked(true)
                     .build());
 
-            userRepository.save(UserEntity.builder()
-                    .firstName("moderator")
-                    .lastName("user")
-                    .mail("moderator@gmail.com")
-                    .code(null)
-                    .role(UserRoles.ROLE_MODERATOR)
-                    .username("moderator")
-                    .password(passwordEncoder.encode("moderator"))
-                    .birthday("1.01.1994")
-                    .gender(Gender.MALE)
-                    .isEnabled(true)
-                    .isAccountNonExpired(true)
-                    .isCredentialsNonExpired(true)
-                    .isAccountNonLocked(true)
-                    .build());
 
             log.info("Data loaded successfully");
         }

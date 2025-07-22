@@ -35,7 +35,7 @@ public class CommentController {
     
     
     @PostMapping
-    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN', 'MODERATOR')")
+    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN')")
     public ResponseEntity<CommentDto> createComment(@RequestBody CreateCommentDto dto,
                                                     @RequestHeader("X-User-ID") UUID userId) {
         CommentDto created = commentService.createComment(dto, userId);
@@ -44,14 +44,14 @@ public class CommentController {
 
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN', 'MODERATOR')")
+    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN')")
     public ResponseEntity<CommentDto> updateComment(@PathVariable UUID id,
                                                     @RequestBody UpdateCommentDto dto) {
         return ResponseEntity.ok(commentService.updateComment(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN', 'MODERATOR')")
+    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN')")
     public ResponseEntity<Void> deleteComment(@PathVariable UUID id) {
         commentService.deleteComment(id);
         return ResponseEntity.noContent().build();
@@ -74,21 +74,21 @@ public class CommentController {
     }
 
     @PostMapping("/{id}/like")
-    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN', 'MODERATOR')")
+    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN')")
     public ResponseEntity<CommentDto> likeComment(@PathVariable UUID id,
                                               @RequestHeader("X-User-ID") UUID userId) {
     return ResponseEntity.ok(commentService.likeComment(id, userId));
     }
 
     @PostMapping("/{id}/dislike")
-    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN', 'MODERATOR')")
+    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN')")
     public ResponseEntity<CommentDto> dislikeComment(@PathVariable UUID id,
                                                 @RequestHeader("X-User-ID") UUID userId) {
     return ResponseEntity.ok(commentService.dislikeComment(id, userId));
     }
 
     @PostMapping("/{parentId}/reply")
-    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN', 'MODERATOR')")
+    @PreAuthorize("hasAnyRole('USER', 'AUTHOR', 'CLUB', 'ADMIN')")
     public ResponseEntity<CommentDto> replyToComment(
         @PathVariable UUID parentId,
         @RequestBody CreateCommentDto dto,

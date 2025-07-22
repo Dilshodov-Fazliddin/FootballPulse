@@ -55,6 +55,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         int code = new Random().nextInt(1000, 9000);
         emailService.sendVerificationCode(userDto.getFirstName(), userDto.getMail(), code);
         userRepository.save(userMapper.toEntity(userDto, code));
+        log.info("User successfully created to '{}'", userDto.getUsername());
         return ResponseEntity.ok(ApiResponse.builder().message("User successfully created").status(200).data(null).build());
     }
 
@@ -96,7 +97,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (user.isEmpty()) {
             throw new DataNotFoundException("User not found with email: " + email);
         }
-
         return user.get().getId();
     }
 
