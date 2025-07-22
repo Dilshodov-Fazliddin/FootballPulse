@@ -6,7 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EmailTemplateBuilder {
+public class
+EmailTemplateBuilder {
     public String buildSubmissionConfirmationBody(String authorName, PostResponseDto post) {
         StringBuilder body = new StringBuilder();
         body.append("Dear ").append(authorName).append(",\n\n");

@@ -40,7 +40,7 @@ public class TeamController {
     }
 
     @DeleteMapping("/{teamId}")
-    @PreAuthorize("hasAnyRole('ROLE_CLUB','ROLE_ADMIN','ROLE_MODERATOR')")
+    @PreAuthorize("hasAnyRole('ROLE_CLUB','ROLE_ADMIN')")
     @Operation(summary = "Delete team",description = "Delete a team. Admins and moderators can also delete a group for any problems or inappropriate chats.")
     public ResponseEntity<ApiResponse<?>> deleteTeam(
             @PathVariable UUID teamId

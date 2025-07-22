@@ -6,5 +6,4 @@ public enum UserRoles {
     ROLE_ADMIN,
     ROLE_AUTHOR,
     ROLE_CLUB,
-    ROLE_MODERATOR
 }
